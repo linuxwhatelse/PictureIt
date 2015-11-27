@@ -1,9 +1,7 @@
-#include "pictureit/pictureit.h"
-#include "pictureit/utils.h"
+#include "pictureit.h"
+#include "utils.h"
 
 #include <GL/gl.h>
-//#include <fnmatch.h>
-//#include <dirent.h>
 
 
 PictureIt::~PictureIt() {

@@ -16,8 +16,13 @@ else(OPENGL_FOUND)
 endif(OPENGL_FOUND)
 
 
-list(APPEND INCLUDES ${PROJECT_SOURCE_DIR}/include)
-list(APPEND INCLUDES ${PROJECT_SOURCE_DIR}/depends)
+list(APPEND INCLUDES ${PROJECT_SOURCE_DIR}/src)
+list(APPEND INCLUDES ${PROJECT_SOURCE_DIR}/src/effects)
+list(APPEND INCLUDES ${PROJECT_SOURCE_DIR}/src/contrib)
+
+if(WIN32)
+    list(APPEND INCLUDES ${PROJECT_SOURCE_DIR}/src/contrib/win32)
+endif(WIN32)
 
 include_directories(${INCLUDES})
 include_directories(${CMAKE_INCLUDE_PATH})
@@ -25,7 +30,7 @@ include_directories(${CMAKE_INCLUDE_PATH})
 # Add all sources
 file(GLOB_RECURSE SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
 
-set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/include" "${PROJECT_SOURCE_DIR}/depends")
+set(CONF_INCLUDE_DIRS "${INCLUDES}")
 configure_file(PictureItConfig.cmake.in "${PROJECT_BINARY_DIR}/PictureItConfig.cmake" @ONLY)
 
 # Enable pic

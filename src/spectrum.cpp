@@ -1,4 +1,4 @@
-#include "pictureit/spectrum.h"
+#include "spectrum.h"
 
 #include <stdio.h>
 #include <math.h>

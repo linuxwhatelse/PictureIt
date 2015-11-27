@@ -1,5 +1,5 @@
-#include "pictureit/effects/crossfade.h"
-#include "pictureit/utils.h"
+#include "crossfade.h"
+#include "utils.h"
 
 #include <stdio.h>
 #include <string>

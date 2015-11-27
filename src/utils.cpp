@@ -1,4 +1,4 @@
-#include "pictureit/utils.h"
+#include "utils.h"
 
 #include <fnmatch.h>
 #include <GL/gl.h>

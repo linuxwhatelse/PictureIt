@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pictureit/effects/effects.h"
+#include "effects.h"
 
 class EFXCrossfade: public EFXBase {
     private:

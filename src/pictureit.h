@@ -1,8 +1,8 @@
 #pragma once
 
-#include "pictureit/spectrum.h"
+#include "spectrum.h"
 
-#include "pictureit/effects/effects.h"
+#include "effects.h"
 
 #include <string>
 #include <vector>
