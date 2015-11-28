@@ -23,7 +23,7 @@ list(APPEND PI_INCLUDES ${PROJECT_SOURCE_DIR}/src/effects)
 list(APPEND PI_INCLUDES ${PROJECT_SOURCE_DIR}/src/contrib)
 
 if(WIN32)
-    list(APPEND INCLUDES ${PROJECT_SOURCE_DIR}/src/contrib/win32)
+    list(APPEND PI_INCLUDES ${PROJECT_SOURCE_DIR}/src/contrib/win32)
 endif()
 
 include_directories(${INCLUDES})
