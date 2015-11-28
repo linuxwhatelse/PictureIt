@@ -41,5 +41,6 @@ configure_file(PictureItConfig.cmake.in "${PROJECT_BINARY_DIR}/PictureItConfig.c
 set(CMAKE_POSITION_INDEPENDENT_CODE 1)
 
 add_library(PictureIt STATIC ${PI_SOURCES})
+set_target_properties(PictureIt PROPERTIES LINKER_LANGUAGE CXX)
 
 install(TARGETS PictureIt DESTINATION ${PROJECT_SOURCE_DIR}/lib)
