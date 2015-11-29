@@ -10,17 +10,17 @@
 
 using namespace std;
 
-class PictureIt {
+class PictureIt : public Spectrum {
     private:
         /*
         :img_texture_ids: holds the texture-ids for images:
            0: The current displayed image.
            1: The next image which fades in.
         */
-        GLuint img_texture_ids[2] =  {};
-        bool   image_update       =  true;
-        time_t img_last_updated     =  time(0);
-        bool   effect_finished    =  true;
+        GLuint img_texture_ids[2]  =  {};
+        bool   img_update          =  true;
+        time_t img_last_updated    =  time(0);
+        bool   img_effect_finished =  true;
 
         vector<string> images;
 
@@ -32,27 +32,24 @@ class PictureIt {
 
     public:
         EFXBase  *EFX      = NULL;
-        Spectrum *SPECTRUM = NULL;
 
         // Values that can be configured by whoever implements PictureIt
-        EFFECT efx                  = EFFECT::Crossfade;
-        bool   update_by_interval   = true;
-        int    img_update_interval  = 180;
+        // Note that the :Spectrum: class (which we inherit from) exposes configurable values
+        // all prefixed with "spectrum_"
+        EFFECT img_efx                 = EFFECT::Crossfade;
+        bool   img_update_by_interval  = true;
+        int    img_update_interval     = 180;
 
-        bool   spectrum_enabled     = true;
-        int    spectrum_bar_count   = 64;
-        float  spectrum_width       = 1.0f;
+        bool   spectrum_enabled        = true;
 
+        PictureIt(int spectrum_bar_count = 64): Spectrum(spectrum_bar_count){};
         ~PictureIt();
 
         void init();
 
-        //void configure(const char *key, int value);
         void update_image(bool force_update = false);
 
         void load_images(const char *image_root_dir);
         
         bool render();
-
-        void audio_data( const float *audio_data, int audio_data_length );
 };
