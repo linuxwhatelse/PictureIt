@@ -1,7 +1,7 @@
 # - Config file for the PictureIt package
 # It defines the following variables
 #  PICTUREIT_INCLUDE_DIRS - include directories for PictureIt
-#  PICTUREIP_LIB_DIR - library directory for PictureIt
+#  PICTUREIT_LIB_DIR - library directory for PictureIt
  
-set(PICTUREIP_LIB_DIR @PICTUREIT_LIB_DIR@)
+set(PICTUREIT_LIB_DIR @PICTUREIT_LIB_DIR@)
 set(PICTUREIT_INCLUDE_DIRS @PICTUREIT_INCLUDE_DIRS@)
