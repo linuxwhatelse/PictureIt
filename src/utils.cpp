@@ -114,22 +114,22 @@ namespace PI_UTILS {
             glColor4f( 1.0f, 1.0f, 1.0f, opacity );
     
     
-        GLfloat tl[2] = { 0.0f - x, 0.0f - x };  // Top Left
-        GLfloat tr[2] = { 1.0f - x, 0.0f - x };  // Top Right
-        GLfloat bl[2] = { 0.0f - y, 1.0f - y };  // Bottom Left
-        GLfloat br[2] = { 1.0f - y, 1.0f - y };  // Bottom Right
-    
+        GLfloat tl[2] = { -1.0f + x, -1.0f + x };  // Top Left
+        GLfloat tr[2] = {  1.0f + x, -1.0f + x };  // Top Right
+        GLfloat br[2] = {  1.0f + y,  1.0f + y };  // Bottom Right
+        GLfloat bl[2] = { -1.0f + y,  1.0f + y };  // Bottom Left
+
         glBegin( GL_TRIANGLES );
-            glTexCoord2f( tl[0], tl[1] ); glVertex2f( -1.0f, -1.0f );  // Top Left
-            glTexCoord2f( tr[0], tr[1] ); glVertex2f(  1.0f, -1.0f );  // Top Right
-            glTexCoord2f( br[0], br[1] ); glVertex2f(  1.0f,  1.0f );  // Bottom Right
+            glTexCoord2f( 0.0f, 0.0f ); glVertex2f( tl[0], tl[1] );  // Top Left
+            glTexCoord2f( 1.0f, 0.0f ); glVertex2f( tr[0], tr[1] );  // Top Right
+            glTexCoord2f( 1.0f, 1.0f ); glVertex2f( br[0], br[1] );  // Bottom Right
         glEnd();
         glBegin( GL_TRIANGLES );
-            glTexCoord2f( br[0], br[1] ); glVertex2f(  1.0f,  1.0f );  // Bottom Right
-            glTexCoord2f( bl[0], bl[1] ); glVertex2f( -1.0f,  1.0f );  // Bottom Left
-            glTexCoord2f( tl[0], tl[1] ); glVertex2f( -1.0f, -1.0f );  // Top Left
+            glTexCoord2f( 1.0f, 1.0f ); glVertex2f( br[0], br[1] );  // Bottom Right
+            glTexCoord2f( 0.0f, 1.0f ); glVertex2f( bl[0], bl[1] );  // Bottom Left
+            glTexCoord2f( 0.0f, 0.0f ); glVertex2f( tl[0], tl[1] );  // Top Left
         glEnd();
-    
+
         glDisable( GL_TEXTURE_2D );
         glDisable( GL_BLEND );
     }
