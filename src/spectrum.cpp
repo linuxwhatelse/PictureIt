@@ -2,15 +2,29 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <algorithm>
 
 Spectrum::Spectrum(int spectrum_bar_count) {
-    this->spectrum_bar_count    = spectrum_bar_count;
+    this->spectrum_bar_count = spectrum_bar_count;
+
     this->bar_heights  = new GLfloat[spectrum_bar_count];
     this->cbar_heights = new GLfloat[spectrum_bar_count];
     this->pbar_heights = new GLfloat[spectrum_bar_count];
+
+    this->spectrum_colors = new GLfloat[spectrum_bar_count*3];
+    for( int i = 0; i < spectrum_bar_count; i++ ) {
+        this->spectrum_colors[ 3*i ]   = 1.0f;
+        this->spectrum_colors[ 3*i+1 ] = 1.0f;
+        this->spectrum_colors[ 3*i+2 ] = 1.0f;
+    }
 }
 
-Spectrum::~Spectrum() {}
+Spectrum::~Spectrum() {
+    delete[] this->bar_heights;
+    delete[] this->cbar_heights;
+    delete[] this->pbar_heights;
+    delete[] this->spectrum_colors;
+}
 
 void Spectrum::audio_data(const float *audio_data, int audio_data_length) {
     for(int i = 0; i < spectrum_bar_count; i++)
@@ -31,7 +45,6 @@ void Spectrum::audio_data(const float *audio_data, int audio_data_length) {
 //   i = index of the bar from left to right
 //   x1 + x2 = width and position of the bar
 void Spectrum::draw_bar( int i, GLfloat x1, GLfloat x2 ) {
-
     if ( ::fabs( cbar_heights[i] - bar_heights[i] ) > 0 ) {
         // The bigger the difference between the current and previous heights, the faster
         // we want the bars to move.
@@ -47,6 +60,8 @@ void Spectrum::draw_bar( int i, GLfloat x1, GLfloat x2 ) {
     pbar_heights[i] = bar_heights[i];
 
     auto&& draw_bar = [&](GLfloat y) {
+        glColor3f( spectrum_colors[ 3*i ], spectrum_colors[ 3*i+1 ], spectrum_colors[ 3*i+2 ] );
+
         glBegin(GL_TRIANGLES);
             glVertex2f( x1, y );                  // Top Left
             glVertex2f( x2, y );                  // Top Right
@@ -101,8 +116,6 @@ void Spectrum::draw_spectrum() {
     // This ensures the exact same height-value for both
     // the left and the (mirrored) right bar
     glPushMatrix();
-        glColor3f( 1.0f, 1.0f, 1.0f );
-
         GLfloat x1, x2, bar_width;
 
         if ( spectrum_mirror_vertical )
@@ -126,4 +139,13 @@ void Spectrum::draw_spectrum() {
             draw_bar( (i-1), x1, x2 );
         }
     glPopMatrix();
+}
+
+void Spectrum::set_bar_color( int pos, int r, int g, int b ) {
+    set_bar_color(pos, r * 1.0f / 255, g * 1.0f / 255, b * 1.0f / 255);
+}
+void Spectrum::set_bar_color( int pos, float r, float g, float b ) {
+    this->spectrum_colors[ 3*pos ]   = r;
+    this->spectrum_colors[ 3*pos+1 ] = g;
+    this->spectrum_colors[ 3*pos+2 ] = b;
 }
