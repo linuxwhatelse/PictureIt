@@ -26,7 +26,7 @@ class Spectrum {
         bool   spectrum_mirror_horizontal = false;    // If the spectrum should be mirror horizontally
 
         void draw_spectrum();
-        void draw_bars( int i, GLfloat x1, GLfloat x2 );
+        void draw_bar( int i, GLfloat x1, GLfloat x2 );
 
         void audio_data( const float *audio_data, int audio_data_length );
 
