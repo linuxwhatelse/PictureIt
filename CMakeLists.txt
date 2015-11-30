@@ -12,14 +12,9 @@ find_package(CXX11 REQUIRED)
 
 # Find and include OpenGL
 find_package(OpenGL REQUIRED)
-if(OPENGL_FOUND)
-    list(APPEND INCLUDES ${OpenGL_INCLUDE_DIRS})
-    list(APPEND DEPLIBS ${OPENGL_LIBRARIES})
-    add_definitions(${OpenGL_DEFINITIONS})
-else()
-    message(FATAL_ERROR "OpenGL not found!")
-endif()
-
+list(APPEND INCLUDES ${OpenGL_INCLUDE_DIRS})
+list(APPEND DEPLIBS ${OPENGL_LIBRARIES})
+add_definitions(${OpenGL_DEFINITIONS})
 
 list(APPEND PI_INCLUDES ${PROJECT_SOURCE_DIR}/src)
 list(APPEND PI_INCLUDES ${PROJECT_SOURCE_DIR}/src/effects)
@@ -55,4 +50,4 @@ set_target_properties(PictureIt PROPERTIES
 
 install(TARGETS PictureIt DESTINATION ${PICTUREIT_LIB_DIR})
 install(FILES ${PI_HEADERS} DESTINATION ${PICTUREIT_INCLUDE_DIRS})
-install(FILES "${PROJECT_BINARY_DIR}/PictureItConfig.cmake" DESTINATION ${PICTUREIT_LIB_DIR}/pictureit)
+install(FILES "${PROJECT_BINARY_DIR}/PictureItConfig.cmake" DESTINATION "${PICTUREIT_LIB_DIR}/pictureit")
