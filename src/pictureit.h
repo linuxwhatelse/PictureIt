@@ -19,6 +19,7 @@ class PictureIt : public Spectrum {
         */
         GLuint img_texture_ids[2]  =  {};
         bool   img_update          =  true;
+        int    img_current_index   =  -1;
         time_t img_last_updated    =  time(0);
         bool   img_effect_finished =  true;
 
@@ -29,6 +30,7 @@ class PictureIt : public Spectrum {
         void start_render();
         void finish_render();
         const char* get_random_image();
+        const char* get_next_image();
 
     public:
         EFXBase  *EFX      = NULL;
@@ -37,6 +39,7 @@ class PictureIt : public Spectrum {
         // Note that the :Spectrum: class (which we inherit from) exposes configurable values
         // all prefixed with "spectrum_"
         EFFECT img_efx                 = EFFECT::Crossfade;
+        bool   img_pick_random         = true;
         bool   img_update_by_interval  = true;
         int    img_update_interval     = 180;
 

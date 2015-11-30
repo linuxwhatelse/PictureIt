@@ -1,6 +1,7 @@
 #include "pictureit.h"
 #include "utils.h"
 
+#include <algorithm>
 #include <GL/gl.h>
 
 PictureIt::~PictureIt() {
@@ -59,6 +60,15 @@ const char* PictureIt::get_random_image() {
     return images[index].c_str();
 }
 
+const char* PictureIt::get_next_image() {
+    if ( img_current_index < images.size() )
+        img_current_index++;
+    else
+        img_current_index = 0;
+
+    return images[img_current_index].c_str();
+}
+
 bool PictureIt::render() {
     start_render();
 
@@ -70,7 +80,13 @@ bool PictureIt::render() {
         img_effect_finished = false;
         img_update    = false;
 
-        bool success = PI_UTILS::load_image( get_random_image(), img_texture_ids[1] );
+        const char* img_path;
+        if ( img_pick_random )
+            img_path = get_random_image();
+        else
+            img_path = get_next_image();
+
+        bool success = PI_UTILS::load_image( img_path, img_texture_ids[1] );
 
         if ( ! success ) {
             // Faild loading image, so when drawing the next frame we immediatelly try to get a new one
@@ -118,6 +134,9 @@ void PictureIt::update_image(bool force_update) {
 }
 
 void PictureIt::load_images(const char *image_root_dir) {
+    img_current_index = -1;
+
     images.clear();
     PI_UTILS::list_dir(image_root_dir, images, true, true, image_filter, sizeof(image_filter));
+    sort(images.begin(), images.end());
 }
