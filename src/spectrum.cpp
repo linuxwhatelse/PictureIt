@@ -74,9 +74,9 @@ void Spectrum::draw_bars( int i, GLfloat x1, GLfloat x2 ) {
     };
 
     GLfloat y;
-    // If the spectrum position is > 0, we want the bars to move UP
-    // If the spectrum position is < 0, we want the bars to move DOWN 
-    if ( spectrum_position > 0.0f ) {
+    // If the spectrum position is >= 0, we want the bars to move UP
+    // If the spectrum position is <  0, we want the bars to move DOWN 
+    if ( spectrum_position >= 0.0f ) {
         y = spectrum_position - cbar_heights[i];
         draw_bar(y);
     } else {
