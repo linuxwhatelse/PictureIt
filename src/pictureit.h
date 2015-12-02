@@ -36,22 +36,22 @@ class PictureIt : public Spectrum {
 
         // Values that can be configured by whoever implements PictureIt
         // Note that the :Spectrum: class (which we inherit from) exposes configurable values
-        // all prefixed with "spectrum_"
-        EFXS   img_efx                 = EFXS::CROSSFADE;
+        // all prefixed with "spectrum_*"
         bool   img_pick_random         = true;
         bool   img_update_by_interval  = true;
         int    img_update_interval     = 180;
 
         bool   spectrum_enabled        = true;
 
-        PictureIt(int spectrum_bar_count = 64): Spectrum(spectrum_bar_count){};
+        PictureIt(int spectrum_bar_count = 64): Spectrum(spectrum_bar_count) {
+            this->EFX = new EFXCrossfade();
+            glGenTextures(2, img_texture_ids);
+        };
+
         ~PictureIt();
 
-        void init();
-
+        void set_img_efx(EFXS efx);
         void update_image(bool force_update = false);
-
         void load_images(const char *image_root_dir);
-        
         bool render();
 };

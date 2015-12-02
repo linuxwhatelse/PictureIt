@@ -10,16 +10,15 @@ PictureIt::~PictureIt() {
     glDeleteTextures(2, img_texture_ids);
 }
 
-void PictureIt::init() {
-    switch (img_efx) {
-        default:
+void PictureIt::set_img_efx(EFXS efx) {
+    delete EFX;
+
+    switch (efx) {
         case EFXS::CROSSFADE:
             EFX = new EFXCrossfade();
             break;
     }
-
-    glGenTextures(2, img_texture_ids);
-}
+};
 
 void PictureIt::start_render() {
     // save OpenGL original state
@@ -101,13 +100,14 @@ bool PictureIt::render() {
         // where a new image will be displayed which will be done by an effect again
         PI_UTILS::draw_image(img_texture_ids[0]);
     } else {
+        if ( )
         if ( glIsTexture(img_texture_ids[0]) )
             img_effect_finished = EFX->render(img_texture_ids[0], img_texture_ids[1]);
         else
             img_effect_finished = EFX->render(0, img_texture_ids[1]);
 
         // Effect finished, therefore we have to swapp the position of both textures
-        if (img_effect_finished) {
+        if ( img_effect_finished ) {
             swap(img_texture_ids[0], img_texture_ids[1]);
 
             // e.g. Kodi needs that. Without it, it looks like one frame is missing once
