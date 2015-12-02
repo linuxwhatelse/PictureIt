@@ -2,8 +2,8 @@
 
 #include <GL/gl.h>
 
-enum class EFFECT {
-    Crossfade
+enum class EFXS {
+    CROSSFADE
 };
 
 class EFXBase {

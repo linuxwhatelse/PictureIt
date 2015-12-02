@@ -13,7 +13,7 @@ PictureIt::~PictureIt() {
 void PictureIt::init() {
     switch (img_efx) {
         default:
-        case EFFECT::Crossfade:
+        case EFXS::CROSSFADE:
             EFX = new EFXCrossfade();
             break;
     }

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "spectrum.h"
-
 #include "effects.h"
 
 #include <string>
@@ -38,7 +37,7 @@ class PictureIt : public Spectrum {
         // Values that can be configured by whoever implements PictureIt
         // Note that the :Spectrum: class (which we inherit from) exposes configurable values
         // all prefixed with "spectrum_"
-        EFFECT img_efx                 = EFFECT::Crossfade;
+        EFXS   img_efx                 = EFXS::CROSSFADE;
         bool   img_pick_random         = true;
         bool   img_update_by_interval  = true;
         int    img_update_interval     = 180;
