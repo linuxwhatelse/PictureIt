@@ -11,6 +11,10 @@ Spectrum::Spectrum(int spectrum_bar_count) {
     this->cbar_heights = new GLfloat[spectrum_bar_count];
     this->pbar_heights = new GLfloat[spectrum_bar_count];
 
+    std::fill_n(this->bar_heights,  spectrum_bar_count, 0.0f);
+    std::fill_n(this->cbar_heights, spectrum_bar_count, 0.0f);
+    std::fill_n(this->pbar_heights, spectrum_bar_count, 0.0f);
+
     this->spectrum_colors = new GLfloat[spectrum_bar_count*3];
     for( int i = 0; i < spectrum_bar_count; i++ ) {
         this->spectrum_colors[ 3*i ]   = 1.0f;
