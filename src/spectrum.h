@@ -20,7 +20,6 @@ class Spectrum {
         ~Spectrum();
 
         float  spectrum_width             = 1.0f;   // Value ranging from 0.0f to 1.0f
-        int    spectrum_bar_width         = 3;      // Value ranging from 1 to n
         float  spectrum_position          = 1.0f;   // Value ranging from -1.0f to 1.0f
                                                     // -1.0f = The very top
                                                     //  0.0f = Center
