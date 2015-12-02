@@ -34,7 +34,7 @@ file(GLOB_RECURSE PI_HEADERS "${PROJECT_SOURCE_DIR}/src/*.h")
 
 # Configure PictureItConfig.cmake.in
 set(PICTUREIT_LIBRARY_DIR "${CMAKE_INSTALL_PREFIX}/lib")
-set(PICTUREIT_INCLUDE_DIR "${CMAKE_INSTALL_PREFIX}/include/PictureIt")
+set(PICTUREIT_INCLUDE_DIR "${CMAKE_INSTALL_PREFIX}/include")
 configure_file(PictureItConfig.cmake.in "${PROJECT_BINARY_DIR}/PictureItConfig.cmake" @ONLY)
 
 # Enable pic
@@ -49,5 +49,5 @@ set_target_properties(PictureIt PROPERTIES
         SOVERSION "${GENERIC_LIB_SOVERSION}")
 
 install(TARGETS PictureIt DESTINATION ${PICTUREIT_LIBRARY_DIR})
-install(FILES ${PI_HEADERS} DESTINATION ${PICTUREIT_INCLUDE_DIR})
+install(FILES ${PI_HEADERS} DESTINATION "${PICTUREIT_INCLUDE_DIR}/PictureIt")
 install(FILES "${PROJECT_BINARY_DIR}/PictureItConfig.cmake" DESTINATION "${PICTUREIT_LIBRARY_DIR}/pictureit")
