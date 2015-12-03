@@ -1,12 +1,10 @@
 #include "crossfade.h"
 #include "utils.h"
 
-#include <stdio.h>
-#include <string>
+#include <cstring>
 
 void EFXCrossfade::configure(const char *key, int value) {
-    std::string k = key;
-    if ( k == "fade_time_ms" )
+    if ( strcmp( key, "fade_time_ms") == 0 )
         fade_time_ms = value;
 }
 
