@@ -28,7 +28,7 @@ namespace PI_UTILS {
         return ( a + "/" + b ).c_str();
     }
     
-    int list_dir(const char *path, vector<string> &store, bool recursive, bool incl_full_path, const char *file_filter[], int filter_size) {
+    bool list_dir(const char *path, vector<string> &store, bool recursive, bool incl_full_path, const char *file_filter[], int filter_size) {
         string p = path;
         struct dirent *entry;
         DIR *dp;
@@ -69,7 +69,7 @@ namespace PI_UTILS {
         }
     
         closedir(dp);
-        return 0;
+        return true;
     }
 
     bool load_image(const char *img_path, GLuint texture_id) {

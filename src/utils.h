@@ -12,6 +12,7 @@ namespace PI_UTILS {
      * @brief Joins two strings together and adds a "/" if not present
      * @param a initial path
      * @param b secondary path that should be added to :a:
+     * @return path combined from :a: and :b:
      */
     const char* path_join(string a, string b);
 
@@ -23,13 +24,15 @@ namespace PI_UTILS {
      * @param incl_full_path whether to add the full, absolute path or only the name
      * @param file_filter only add to :store: if the element matches one of the filter criteria
      * @param filter_size size of the filter
+     * @return true if successful, false otherwise
      */
-    int list_dir(const char *path, vector<string> &store, bool recursive = false, bool incl_full_path = true, const char *file_filter[] = NULL, int filter_size = 0);
+    bool list_dir(const char *path, vector<string> &store, bool recursive = false, bool incl_full_path = true, const char *file_filter[] = NULL, int filter_size = 0);
 
     /*!
      * @brief Loads a image into a OpenGL texture
      * @param img_path path to an image
      * @param texture_id OpenGL texture-id to map bind the image to (check OpenGLs :glGenTextures(): on how to create one)
+     * @return true if successful, false otherwise
      */
     bool load_image(const char *img_path, GLuint texture_id);
 
