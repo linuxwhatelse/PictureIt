@@ -9,6 +9,12 @@ using namespace std;
 
 namespace PI_UTILS {
     /*!
+     * @brief Returns the current time in milliseconds
+     * @return current time in milliseconds
+     */
+    long int get_current_time_ms();
+
+    /*!
      * @brief Joins two strings together and adds a "/" if not present
      * @param a initial path
      * @param b secondary path that should be added to :a:

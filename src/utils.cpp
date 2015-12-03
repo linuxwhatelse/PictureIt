@@ -1,6 +1,7 @@
 #include "utils.h"
 
 #include <fnmatch.h>
+#include <sys/time.h>
 #include <GL/gl.h>
 
 #include <dirent.h>
@@ -9,6 +10,13 @@
 #include "stb_image.h"
 
 namespace PI_UTILS {
+    long int get_current_time_ms() {
+        struct timeval current_time;
+        gettimeofday( &current_time, NULL );
+
+        return current_time.tv_sec * 1000 + current_time.tv_usec / 1000;
+    }
+
     const char* path_join(string a, string b) {
         // Apparently Windows does understand a "/" just fine...
         // Haven't tested it though, but for now I'm just believing it
