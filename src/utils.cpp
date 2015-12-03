@@ -97,7 +97,8 @@ namespace PI_UTILS {
         return true;
     }
     
-    void draw_image(GLuint texture_id, float x, float y, float opacity) {
+    void draw_image(GLuint texture_id, GLfloat tl[], GLfloat tr[], GLfloat bl[], GLfloat br[], float opacity) {
+
         if ( ! texture_id )
             return;
     
@@ -113,11 +114,28 @@ namespace PI_UTILS {
         else
             glColor4f( 1.0f, 1.0f, 1.0f, opacity );
     
-    
-        GLfloat tl[2] = { -1.0f + x, -1.0f + x };  // Top Left
-        GLfloat tr[2] = {  1.0f + x, -1.0f + x };  // Top Right
-        GLfloat br[2] = {  1.0f + y,  1.0f + y };  // Bottom Right
-        GLfloat bl[2] = { -1.0f + y,  1.0f + y };  // Bottom Left
+
+        bool del_tl = false, del_tr = false, del_br = false, del_bl = false;
+        if ( ! tl ) {
+            tl = new GLfloat[2];
+            tl[0] = -1.0f; tl[1] = -1.0f;
+            del_tl = true;
+        }
+        if ( ! tr ) {
+            tr = new GLfloat[2];
+            tr[0] = 1.0f; tr[1] = -1.0f;
+            del_tr = true;
+        }
+        if ( ! bl ) {
+            bl = new GLfloat[2];
+            bl[0] = -1.0f; bl[1] = 1.0f;
+            del_bl = true;
+        }
+        if ( ! br ) {
+            br = new GLfloat[2];
+            br[0] = 1.0f; br[1] = 1.0f;
+            del_br = true;
+        }
 
         glBegin( GL_TRIANGLES );
             glTexCoord2f( 0.0f, 0.0f ); glVertex2f( tl[0], tl[1] );  // Top Left
@@ -132,5 +150,14 @@ namespace PI_UTILS {
 
         glDisable( GL_TEXTURE_2D );
         glDisable( GL_BLEND );
+
+        if (del_tl)
+            delete [] tl;
+        if (del_tr)
+            delete [] tr;
+        if (del_bl)
+            delete [] bl;
+        if (del_br)
+            delete [] br;
     }
 }

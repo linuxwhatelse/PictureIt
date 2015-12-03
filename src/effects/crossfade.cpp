@@ -21,7 +21,7 @@ bool EFXCrossfade::render(GLuint old_texture, GLuint new_texture) {
 
     // Fade out old image
     if ( fade_current < 1.0f )
-        PI_UTILS::draw_image( old_texture, 0.0f, 0.0f, 1.0f - fade_current );
+        PI_UTILS::draw_image( old_texture, NULL, NULL, NULL, NULL, 1.0f - fade_current );
 
     // Fade in new image
     if ( fade_offset_ms && fade_current < 1.0f ) {
@@ -35,7 +35,7 @@ bool EFXCrossfade::render(GLuint old_texture, GLuint new_texture) {
             fade_last = fade_current;
         }
 
-        PI_UTILS::draw_image( new_texture, 0.0f, 0.0f, fade_current );
+        PI_UTILS::draw_image( new_texture,  NULL, NULL, NULL, NULL, fade_current );
         return false;
     }
 
