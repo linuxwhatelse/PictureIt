@@ -16,11 +16,6 @@ bool EFXCrossfade::render(GLuint old_texture, GLuint new_texture) {
         fade_offset_ms = PI_UTILS::get_current_time_ms() % fade_time_ms;
     }
 
-    // Fade out old image
-    if ( fade_current < 1.0f )
-        PI_UTILS::draw_image( old_texture, NULL, NULL, NULL, NULL, 1.0f - fade_current );
-
-    // Fade in new image
     if ( fade_offset_ms && fade_current < 1.0f ) {
         fade_current = (float) ( ( PI_UTILS::get_current_time_ms() - fade_offset_ms ) % fade_time_ms ) / fade_time_ms;
 
@@ -28,19 +23,19 @@ bool EFXCrossfade::render(GLuint old_texture, GLuint new_texture) {
             fade_last       = 0.0f;
             fade_current    = 1.0f;
             fade_offset_ms  = 0;
-        } else {
+        } else
             fade_last = fade_current;
-        }
 
+        // Fade out old image
+        PI_UTILS::draw_image( old_texture, NULL, NULL, NULL, NULL, 1.0f - fade_current );
+
+        // Fade in new image
         PI_UTILS::draw_image( new_texture,  NULL, NULL, NULL, NULL, fade_current );
+
         return false;
     }
 
-    // When we reach this point, the crossfade effect finished. Therefor
-    // we set :initial: back to :true: so that the values get initialized again
-    // when this effect gets called the next time
     initial = true;
 
-    // We let whoever used us know that the we are done with our effect
     return true;
 }
