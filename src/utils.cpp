@@ -47,7 +47,7 @@ namespace PI_UTILS {
                     add = true;
     
                 if ( recursive )
-                    return PI_UTILS::list_dir( PI_UTILS::path_join( p, name), store, recursive, incl_full_path, file_filter, filter_size );
+                    PI_UTILS::list_dir( PI_UTILS::path_join( p, name), store, recursive, incl_full_path, file_filter, filter_size );
             } else if ( entry->d_type != DT_DIR && name && name[0] != '.' ) {
                 if ( file_filter ) {
                     for ( unsigned int i = 0; i < filter_size / sizeof( file_filter[0] ); i++) {
