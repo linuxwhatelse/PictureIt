@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 #include <string>
-#include <sys/time.h>
 
 void EFXCrossfade::configure(const char *key, int value) {
     std::string k = key;
@@ -16,7 +15,7 @@ bool EFXCrossfade::render(GLuint old_texture, GLuint new_texture) {
     if ( initial ) {
         initial = false;
         fade_current = 0.0f;
-        fade_offset_ms = get_current_time_ms() % fade_time_ms;
+        fade_offset_ms = PI_UTILS::get_current_time_ms() % fade_time_ms;
     }
 
     // Fade out old image
@@ -25,7 +24,7 @@ bool EFXCrossfade::render(GLuint old_texture, GLuint new_texture) {
 
     // Fade in new image
     if ( fade_offset_ms && fade_current < 1.0f ) {
-        fade_current = (float) ( ( get_current_time_ms() - fade_offset_ms ) % fade_time_ms ) / fade_time_ms;
+        fade_current = (float) ( ( PI_UTILS::get_current_time_ms() - fade_offset_ms ) % fade_time_ms ) / fade_time_ms;
 
         if (fade_current < fade_last) {
             fade_last       = 0.0f;
@@ -46,11 +45,4 @@ bool EFXCrossfade::render(GLuint old_texture, GLuint new_texture) {
 
     // We let whoever used us know that the we are done with our effect
     return true;
-}
-
-long int EFXCrossfade::get_current_time_ms() {
-    struct timeval current_time;
-    gettimeofday( &current_time, NULL );
-
-    return current_time.tv_sec * 1000 + current_time.tv_usec / 1000;
 }
