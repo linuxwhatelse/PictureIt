@@ -71,49 +71,50 @@ const char* PictureIt::get_next_image() {
 bool PictureIt::render() {
     start_render();
 
-    if ( img_update_by_interval && img_effect_finished && time(0) >= ( img_last_updated + img_update_interval ))
-        img_update = true;
-
-    if (img_update == true) {
-        img_last_updated = time(0);
-        img_effect_finished = false;
-        img_update    = false;
-
-        const char* img_path;
-        if ( img_pick_random )
-            img_path = get_random_image();
-        else
-            img_path = get_next_image();
-
-        bool success = PI_UTILS::load_image( img_path, img_texture_ids[1] );
-
-        if ( ! success ) {
-            // Faild loading image, so when drawing the next frame we immediatelly try to get a new one
-            // If we'd do it in the "load_image" methode we could end up in an endless-loop in the main-thread
-            // if only broken images are available within a preset
+    if ( ! images.empty() ) {
+        if ( img_update_by_interval && img_effect_finished && time(0) >= ( img_last_updated + img_update_interval ))
             img_update = true;
+
+        if ( img_update == true ) {
+            img_last_updated    = time(0);
+            img_effect_finished = false;
+            img_update          = false;
+
+            const char* img_path;
+            if ( img_pick_random )
+                img_path = get_random_image();
+            else
+                img_path = get_next_image();
+
+            bool success = PI_UTILS::load_image( img_path, img_texture_ids[1] );
+
+            if ( ! success ) {
+                // Faild loading image, so when drawing the next frame we immediatelly try to get a new one
+                // If we'd do it in the "load_image" methode we could end up in an endless-loop in the main-thread
+                // if only broken images are available within a preset
+                img_update = true;
+            }
         }
-    }
 
-    if ( img_effect_finished ) {
-        // From now on we keep drawing the current image ourself up to the point
-        // where a new image will be displayed which will be done by an effect again
-        PI_UTILS::draw_image(img_texture_ids[0]);
-    } else {
-        if ( )
-        if ( glIsTexture(img_texture_ids[0]) )
-            img_effect_finished = EFX->render(img_texture_ids[0], img_texture_ids[1]);
-        else
-            img_effect_finished = EFX->render(0, img_texture_ids[1]);
-
-        // Effect finished, therefore we have to swapp the position of both textures
         if ( img_effect_finished ) {
-            swap(img_texture_ids[0], img_texture_ids[1]);
-
-            // e.g. Kodi needs that. Without it, it looks like one frame is missing once
-            // the effect finished.
-            // It doesn't hurt so it's fine for now
+            // From now on we keep drawing the current image ourself up to the point
+            // where a new image will be displayed which will be done by an effect again
             PI_UTILS::draw_image(img_texture_ids[0]);
+        } else {
+            if ( glIsTexture(img_texture_ids[0]) )
+                img_effect_finished = EFX->render(img_texture_ids[0], img_texture_ids[1]);
+            else
+                img_effect_finished = EFX->render(0, img_texture_ids[1]);
+
+            // Effect finished, therefore we have to swapp the position of both textures
+            if ( img_effect_finished ) {
+                swap(img_texture_ids[0], img_texture_ids[1]);
+
+                // e.g. Kodi needs that. Without it, it looks like one frame is missing once
+                // the effect finished.
+                // It doesn't hurt so it's fine for now
+                PI_UTILS::draw_image(img_texture_ids[0]);
+            }
         }
     }
 
