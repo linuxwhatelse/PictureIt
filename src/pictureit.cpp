@@ -14,8 +14,12 @@ void PictureIt::set_img_efx(EFXS efx) {
     delete EFX;
 
     switch (efx) {
+        default:
         case EFXS::CROSSFADE:
             EFX = new EFXCrossfade();
+            break;
+        case EFXS::SLIDE:
+            EFX = new EFXSlide();
             break;
     }
 };

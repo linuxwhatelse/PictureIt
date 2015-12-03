@@ -3,7 +3,8 @@
 #include <GL/gl.h>
 
 enum class EFXS {
-    CROSSFADE
+    CROSSFADE,
+    SLIDE
 };
 
 class EFXBase {
@@ -14,3 +15,4 @@ class EFXBase {
 
 // Include all available effects here
 #include "crossfade.h"
+#include "slide.h"
