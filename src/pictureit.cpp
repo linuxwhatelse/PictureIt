@@ -10,18 +10,29 @@ PictureIt::~PictureIt() {
     glDeleteTextures(2, img_texture_ids);
 }
 
-void PictureIt::set_img_efx(EFXS efx) {
+EFXS PictureIt::get_img_transition_efx() {
+    return img_transition_efx;
+}
+
+bool PictureIt::set_img_transition_efx(EFXS efx) {
+    if ( ! img_effect_finished )
+        return false;
+
     delete EFX;
 
     switch (efx) {
         default:
         case EFXS::CROSSFADE:
             EFX = new EFXCrossfade();
+            img_transition_efx = EFXS::CROSSFADE;
             break;
         case EFXS::SLIDE:
             EFX = new EFXSlide();
+            img_transition_efx = EFXS::SLIDE;
             break;
     }
+
+    return true;
 };
 
 void PictureIt::start_render() {

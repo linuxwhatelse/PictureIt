@@ -21,6 +21,7 @@ class PictureIt : public Spectrum {
         int    img_current_index   =  -1;
         time_t img_last_updated    =  time(0);
         bool   img_effect_finished =  true;
+        EFXS   img_transition_efx  =  EFXS::CROSSFADE;
 
         vector<string> images;
 
@@ -50,7 +51,8 @@ class PictureIt : public Spectrum {
 
         ~PictureIt();
 
-        void set_img_efx(EFXS efx);
+        bool set_img_transition_efx(EFXS efx);
+        EFXS get_img_transition_efx();
         void update_image(bool force_update = false);
         void load_images(const char *image_root_dir);
         bool render();
