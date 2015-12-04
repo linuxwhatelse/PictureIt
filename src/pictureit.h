@@ -44,6 +44,7 @@ class PictureIt : public Spectrum {
 
         bool   spectrum_enabled        = true;
 
+        
         PictureIt(int spectrum_bar_count = 64): Spectrum(spectrum_bar_count) {
             this->EFX = new EFXCrossfade();
             glGenTextures(2, img_texture_ids);
@@ -51,9 +52,34 @@ class PictureIt : public Spectrum {
 
         ~PictureIt();
 
+        /*!
+         * @brief If NO transition is active, sets the new transition effect
+         * @param efx Effect to activate. Available effects are defined in the effects.h file within the :EFXS: enum
+         * @return true if the new effect was activated, false otherwise
+         */
         bool set_img_transition_efx(EFXS efx);
+
+        /*!
+         * @brief Get the current image transition effect
+         * @return the current image transition effect
+         */
         EFXS get_img_transition_efx();
+
+        /*!
+         * @brief Display the next image
+         * @param force_update If a transition if active, the image will not be updated unless this param is set to true
+         */
         void update_image(bool force_update = false);
+
+        /*!
+         * @brief Loads all found images into the stack of images to display
+         * @param img_root_dir absolute path to a directory which should be search recursively for images
+         */
         void load_images(const char *image_root_dir);
+
+        /*!
+         * @brief Renders one frame
+         * @return true if a image transition effect is active, false otherwise
+         */
         bool render();
 };
