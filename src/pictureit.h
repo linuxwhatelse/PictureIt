@@ -23,6 +23,9 @@ class PictureIt : public Spectrum {
         bool   img_effect_finished =  true;
         EFXS   img_transition_efx  =  EFXS::CROSSFADE;
 
+        int image_width            =  0;
+        int image_height           =  0;
+
         vector<string> images;
 
         const char *image_filter[3] = { "*.jpg", "*.png", "*.jpeg" };
@@ -38,6 +41,8 @@ class PictureIt : public Spectrum {
         // Values that can be configured by whoever implements PictureIt
         // Note that the :Spectrum: class (which we inherit from) exposes configurable values
         // all prefixed with "spectrum_*"
+        int    window_width            = 0;
+        int    window_height           = 0;
         bool   img_pick_random         = true;
         bool   img_update_by_interval  = true;
         int    img_update_interval     = 180;
@@ -46,7 +51,7 @@ class PictureIt : public Spectrum {
 
         
         PictureIt(int spectrum_bar_count = 64): Spectrum(spectrum_bar_count) {
-            this->EFX = new EFXCrossfade();
+            set_img_transition_efx(img_transition_efx);
             glGenTextures(2, img_texture_ids);
         };
 

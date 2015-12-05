@@ -32,6 +32,9 @@ bool PictureIt::set_img_transition_efx(EFXS efx) {
             break;
     }
 
+    EFX->image_width  = image_width;
+    EFX->image_height = image_height;
+
     return true;
 };
 
@@ -101,20 +104,26 @@ bool PictureIt::render() {
             else
                 img_path = get_next_image();
 
-            bool success = PI_UTILS::load_image( img_path, img_texture_ids[1] );
-
+            bool success = PI_UTILS::load_image( img_path, img_texture_ids[1], image_width, image_height );
             if ( ! success ) {
                 // Faild loading image, so when drawing the next frame we immediatelly try to get a new one
                 // If we'd do it in the "load_image" methode we could end up in an endless-loop in the main-thread
                 // if only broken images are available within a preset
                 img_update = true;
+            } else {
+                EFX->image_width  = image_width;
+                EFX->image_height = image_height;
             }
         }
+
+        // Window size might suddenly change, therefore we update it every frame
+        EFX->window_width  = window_width;
+        EFX->window_height = window_height;
 
         if ( img_effect_finished ) {
             // From now on we keep drawing the current image ourself up to the point
             // where a new image will be displayed which will be done by an effect again
-            PI_UTILS::draw_image(img_texture_ids[0]);
+            EFX->draw_image(img_texture_ids[0]);
         } else {
             if ( glIsTexture(img_texture_ids[0]) )
                 img_effect_finished = EFX->render(img_texture_ids[0], img_texture_ids[1]);
@@ -128,7 +137,7 @@ bool PictureIt::render() {
                 // e.g. Kodi needs that. Without it, it looks like one frame is missing once
                 // the effect finished.
                 // It doesn't hurt so it's fine for now
-                PI_UTILS::draw_image(img_texture_ids[0]);
+                EFX->draw_image(img_texture_ids[0]);
             }
         }
     }

@@ -38,11 +38,11 @@ bool EFXSlide::render(GLuint old_texture, GLuint new_texture) {
     if ( initial ) {
         initial = false;
         pos_current = 0.0f;
-        pos_offset_ms = (PI_UTILS::get_current_time_ms() % slide_time_ms);
+        pos_offset_ms = (get_current_time_ms() % slide_time_ms);
     }
 
     if ( pos_offset_ms && pos_current < 2.0f ) {
-        pos_current = (float) ( ( PI_UTILS::get_current_time_ms() - pos_offset_ms ) % slide_time_ms ) / slide_time_ms * 2;
+        pos_current = (float) ( ( get_current_time_ms() - pos_offset_ms ) % slide_time_ms ) / slide_time_ms * 2;
 
         if (pos_current < pos_last) {
             pos_last       = 0.0f;
@@ -56,14 +56,14 @@ bool EFXSlide::render(GLuint old_texture, GLuint new_texture) {
         tr[0] =  1.0f + pos_current;
         bl[0] = -1.0f + pos_current;
         br[0] =  1.0f + pos_current;
-        PI_UTILS::draw_image( old_texture, tl, tr, bl, br);
+        draw_image( old_texture, tl, tr, bl, br);
 
         // Slide in new image
         tl[0] = -3.0f + pos_current;
         tr[0] = -1.0f + pos_current;
         bl[0] = -3.0f + pos_current;
         br[0] = -1.0f + pos_current;
-        PI_UTILS::draw_image( new_texture, tl, tr, bl, br);
+        draw_image( new_texture, tl, tr, bl, br);
 
         return false;
     }

@@ -1,22 +1,17 @@
 #include "utils.h"
 
 #include <fnmatch.h>
-#include <sys/time.h>
 #include <GL/gl.h>
 
 #include <dirent.h>
 
 #define STB_IMAGE_IMPLEMENTATION
+#define STBI_ONLY_JPEG
+#define STBI_ONLY_PNG
+#define STBI_ONLY_BMP
 #include "stb_image.h"
 
 namespace PI_UTILS {
-    long int get_current_time_ms() {
-        struct timeval current_time;
-        gettimeofday( &current_time, NULL );
-
-        return current_time.tv_sec * 1000 + current_time.tv_usec / 1000;
-    }
-
     const char* path_join(string a, string b) {
         // Apparently Windows does understand a "/" just fine...
         // Haven't tested it though, but for now I'm just believing it
@@ -80,13 +75,16 @@ namespace PI_UTILS {
         return true;
     }
 
-    bool load_image(const char *img_path, GLuint texture_id) {
+    bool load_image(const char *img_path, GLuint texture_id, int &width, int &height) {
         if ( ! texture_id )
             return false;
     
         int x, y, n;
         unsigned char *data = stbi_load(img_path, &x, &y, &n, 0);
     
+        width = x;
+        height = y;
+
         if(data == nullptr)
             return false;
     
@@ -103,69 +101,5 @@ namespace PI_UTILS {
         glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
     
         return true;
-    }
-    
-    void draw_image(GLuint texture_id, GLfloat tl[], GLfloat tr[], GLfloat bl[], GLfloat br[], float opacity) {
-
-        if ( ! texture_id )
-            return;
-    
-        glEnable( GL_TEXTURE_2D );
-        glEnable( GL_BLEND );
-    
-        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-    
-        glBindTexture( GL_TEXTURE_2D, texture_id );
-    
-        if ( ! texture_id )
-            glColor4f( 0.0f, 0.0f, 0.0f, opacity );
-        else
-            glColor4f( 1.0f, 1.0f, 1.0f, opacity );
-    
-
-        bool del_tl = false, del_tr = false, del_br = false, del_bl = false;
-        if ( ! tl ) {
-            tl = new GLfloat[2];
-            tl[0] = -1.0f; tl[1] = -1.0f;
-            del_tl = true;
-        }
-        if ( ! tr ) {
-            tr = new GLfloat[2];
-            tr[0] = 1.0f; tr[1] = -1.0f;
-            del_tr = true;
-        }
-        if ( ! bl ) {
-            bl = new GLfloat[2];
-            bl[0] = -1.0f; bl[1] = 1.0f;
-            del_bl = true;
-        }
-        if ( ! br ) {
-            br = new GLfloat[2];
-            br[0] = 1.0f; br[1] = 1.0f;
-            del_br = true;
-        }
-
-        glBegin( GL_TRIANGLES );
-            glTexCoord2f( 0.0f, 0.0f ); glVertex2f( tl[0], tl[1] );  // Top Left
-            glTexCoord2f( 1.0f, 0.0f ); glVertex2f( tr[0], tr[1] );  // Top Right
-            glTexCoord2f( 1.0f, 1.0f ); glVertex2f( br[0], br[1] );  // Bottom Right
-        glEnd();
-        glBegin( GL_TRIANGLES );
-            glTexCoord2f( 1.0f, 1.0f ); glVertex2f( br[0], br[1] );  // Bottom Right
-            glTexCoord2f( 0.0f, 1.0f ); glVertex2f( bl[0], bl[1] );  // Bottom Left
-            glTexCoord2f( 0.0f, 0.0f ); glVertex2f( tl[0], tl[1] );  // Top Left
-        glEnd();
-
-        glDisable( GL_TEXTURE_2D );
-        glDisable( GL_BLEND );
-
-        if (del_tl)
-            delete [] tl;
-        if (del_tr)
-            delete [] tr;
-        if (del_bl)
-            delete [] bl;
-        if (del_br)
-            delete [] br;
     }
 }
