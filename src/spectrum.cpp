@@ -146,6 +146,12 @@ void Spectrum::draw_spectrum() {
             x1 = x1 + ( bar_width / 4 );
             x2 = x2 - ( bar_width / 4 );
 
+            // If the spectrum position is > 0, we want to flip the bars position
+            if ( spectrum_position_horizontal > 0.0f ) {
+                x1 = -x1;
+                x2 = -x2;
+            }
+
             draw_bar( (i-1), x1, x2 );
         }
     glPopMatrix();
