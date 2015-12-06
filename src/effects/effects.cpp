@@ -1,3 +1,6 @@
+#include <iostream>
+
+
 #include "effects.h"
 
 #include <sys/time.h>
@@ -30,27 +33,34 @@ void EFXBase::draw_image(GLuint texture_id, GLfloat top_left[], GLfloat top_righ
     if ( ! texture_id )
         return;
 
-    if ( top_left )
+    if ( top_left ) {
         std::copy_n(top_left, 2, this->tl);
-    else
-        this->tl[0] = -1.0f; this->tl[1] = -1.0f;
+    } else {
+        this->tl[0] = -1.0f;
+        this->tl[1] = -1.0f;
+    }
 
     if ( top_right )
         std::copy_n(top_right, 2, this->tr);
-    else
-        this->tr[0] = 1.0f; this->tr[1] = -1.0f;
+    else {
+        this->tr[0] = 1.0f;
+        this->tr[1] = -1.0f;
+    }
 
-    if ( bottom_left )
+    if ( bottom_left ) {
         std::copy_n(bottom_left, 2, this->bl);
-    else
-        this->bl[0] = -1.0f; this->bl[1] = 1.0f;
+    } else {
+        this->bl[0] = -1.0f;
+        this->bl[1] = 1.0f;
+    }
 
-    if ( bottom_right )
+    if ( bottom_right ) {
         std::copy_n(bottom_right, 2, this->br);
-    else
-        this->br[0] = 1.0f; this->br[1] = 1.0f;
+    } else {
+        this->br[0] = 1.0f;
+        this->br[1] = 1.0f;
+    }
     
-
     glEnable( GL_TEXTURE_2D );
     glEnable( GL_BLEND );
 
