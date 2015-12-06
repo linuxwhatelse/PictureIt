@@ -2,7 +2,7 @@
 
 #include <GL/gl.h>
 
-enum class EFXS {
+enum class EFX {
     CROSSFADE,
     SLIDE,
     // FLIP

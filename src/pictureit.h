@@ -21,7 +21,7 @@ class PictureIt : public Spectrum {
         int    img_current_index   =  -1;
         time_t img_last_updated    =  time(0);
         bool   img_effect_finished =  true;
-        EFXS   img_transition_efx  =  EFXS::CROSSFADE;
+        EFX    img_transition_efx  =  EFX::CROSSFADE;
 
         int image_width            =  0;
         int image_height           =  0;
@@ -36,7 +36,7 @@ class PictureIt : public Spectrum {
         const char* get_next_image();
 
     public:
-        EFXBase  *EFX      = NULL;
+        EFXBase  *efx = NULL;
 
         // Values that can be configured by whoever implements PictureIt
         // Note that the :Spectrum: class (which we inherit from) exposes configurable values
@@ -59,16 +59,16 @@ class PictureIt : public Spectrum {
 
         /*!
          * @brief If NO transition is active, sets the new transition effect
-         * @param efx Effect to activate. Available effects are defined in the effects.h file within the :EFXS: enum
+         * @param efx Effect to activate. Available effects are defined in the effects.h file within the :EFX: enum
          * @return true if the new effect was activated, false otherwise
          */
-        bool set_img_transition_efx(EFXS efx);
+        bool set_img_transition_efx(EFX efx);
 
         /*!
          * @brief Get the current image transition effect
          * @return the current image transition effect
          */
-        EFXS get_img_transition_efx();
+        EFX get_img_transition_efx();
 
         /*!
          * @brief Display the next image

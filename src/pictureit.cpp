@@ -5,35 +5,35 @@
 #include <GL/gl.h>
 
 PictureIt::~PictureIt() {
-    delete EFX;
+    delete this->efx;
 
     glDeleteTextures(2, img_texture_ids);
 }
 
-EFXS PictureIt::get_img_transition_efx() {
+EFX PictureIt::get_img_transition_efx() {
     return img_transition_efx;
 }
 
-bool PictureIt::set_img_transition_efx(EFXS efx) {
+bool PictureIt::set_img_transition_efx(EFX efx) {
     if ( ! img_effect_finished )
         return false;
 
-    delete EFX;
+    delete this->efx;
 
     switch (efx) {
         default:
-        case EFXS::CROSSFADE:
-            EFX = new EFXCrossfade();
-            img_transition_efx = EFXS::CROSSFADE;
+        case EFX::CROSSFADE:
+            this->efx = new EFXCrossfade();
+            img_transition_efx = EFX::CROSSFADE;
             break;
-        case EFXS::SLIDE:
-            EFX = new EFXSlide();
-            img_transition_efx = EFXS::SLIDE;
+        case EFX::SLIDE:
+            this->efx = new EFXSlide();
+            img_transition_efx = EFX::SLIDE;
             break;
     }
 
-    EFX->image_width  = image_width;
-    EFX->image_height = image_height;
+    this->efx->image_width  = image_width;
+    this->efx->image_height = image_height;
 
     return true;
 };
@@ -111,24 +111,24 @@ bool PictureIt::render() {
                 // if only broken images are available within a preset
                 img_update = true;
             } else {
-                EFX->image_width  = image_width;
-                EFX->image_height = image_height;
+                efx->image_width  = image_width;
+                efx->image_height = image_height;
             }
         }
 
         // Window size might suddenly change, therefore we update it every frame
-        EFX->window_width  = window_width;
-        EFX->window_height = window_height;
+        efx->window_width  = window_width;
+        efx->window_height = window_height;
 
         if ( img_effect_finished ) {
             // From now on we keep drawing the current image ourself up to the point
             // where a new image will be displayed which will be done by an effect again
-            EFX->draw_image(img_texture_ids[0]);
+            efx->draw_image(img_texture_ids[0]);
         } else {
             if ( glIsTexture(img_texture_ids[0]) )
-                img_effect_finished = EFX->render(img_texture_ids[0], img_texture_ids[1]);
+                img_effect_finished = efx->render(img_texture_ids[0], img_texture_ids[1]);
             else
-                img_effect_finished = EFX->render(0, img_texture_ids[1]);
+                img_effect_finished = efx->render(0, img_texture_ids[1]);
 
             // Effect finished, therefore we have to swapp the position of both textures
             if ( img_effect_finished ) {
@@ -137,7 +137,7 @@ bool PictureIt::render() {
                 // e.g. Kodi needs that. Without it, it looks like one frame is missing once
                 // the effect finished.
                 // It doesn't hurt so it's fine for now
-                EFX->draw_image(img_texture_ids[0]);
+                efx->draw_image(img_texture_ids[0]);
             }
         }
     }
