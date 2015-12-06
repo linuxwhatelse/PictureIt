@@ -48,7 +48,7 @@ void Spectrum::audio_data(const float *audio_data, int audio_data_length) {
 // Draw a single bar
 //   i = index of the bar from left to right
 //   x1 + x2 = width and position of the bar
-void Spectrum::draw_bar( int i, GLfloat x1, GLfloat x2 ) {
+void Spectrum::draw_bar( int i, GLfloat pos_x1, GLfloat pos_x2 ) {
     if ( ::fabs( cbar_heights[i] - bar_heights[i] ) > 0 ) {
         // The bigger the difference between the current and previous heights, the faster
         // we want the bars to move.
@@ -63,56 +63,62 @@ void Spectrum::draw_bar( int i, GLfloat x1, GLfloat x2 ) {
 
     pbar_heights[i] = bar_heights[i];
 
-    auto&& draw_bar = [&](GLfloat y) {
+    auto&& draw_bar = [&](GLfloat x1, GLfloat x2, GLfloat y) {
         glColor3f( spectrum_colors[ 3*i ], spectrum_colors[ 3*i+1 ], spectrum_colors[ 3*i+2 ] );
 
         glBegin(GL_TRIANGLES);
-            glVertex2f( x1, y );                  // Top Left
-            glVertex2f( x2, y );                  // Top Right
-            glVertex2f( x2, spectrum_position );  // Bottom Right
+            glVertex2f( x1, y );                           // Top Left
+            glVertex2f( x2, y );                           // Top Right
+            glVertex2f( x2, spectrum_position_vertical );  // Bottom Right
         glEnd();
         glBegin(GL_TRIANGLES);
-            glVertex2f( x2, spectrum_position );  // Bottom Right
-            glVertex2f( x1, spectrum_position );  // Bottom Left
-            glVertex2f( x1, y );                  // Top Left
+            glVertex2f( x2, spectrum_position_vertical );  // Bottom Right
+            glVertex2f( x1, spectrum_position_vertical );  // Bottom Left
+            glVertex2f( x1, y );                           // Top Left
         glEnd();
 
         if ( spectrum_mirror_vertical ) {
+            x1 = x1 - ( spectrum_position_horizontal * 2 );
+            x2 = x2 - ( spectrum_position_horizontal * 2 );
+
             // This is the mirrored part on the right side
             glBegin(GL_TRIANGLES);
-                glVertex2f( -x2, y );                  // Top Left
-                glVertex2f( -x1, y );                  // Top Right
-                glVertex2f( -x1, spectrum_position );  // Bottom Right
+                glVertex2f( -x2, y );                           // Top Left
+                glVertex2f( -x1, y );                           // Top Right
+                glVertex2f( -x1, spectrum_position_vertical );  // Bottom Right
             glEnd();
             glBegin(GL_TRIANGLES);
-                glVertex2f( -x1, spectrum_position );  // Bottom Right
-                glVertex2f( -x2, spectrum_position );  // Bottom Left
-                glVertex2f( -x2, y );                  // Top Left
+                glVertex2f( -x1, spectrum_position_vertical );  // Bottom Right
+                glVertex2f( -x2, spectrum_position_vertical );  // Bottom Left
+                glVertex2f( -x2, y );                           // Top Left
             glEnd();
         }
     };
 
     GLfloat y;
+    pos_x1 = pos_x1 + spectrum_position_horizontal;
+    pos_x2 = pos_x2 + spectrum_position_horizontal;
+
     // If the spectrum position is >= 0, we want the bars to move UP
     // If the spectrum position is <  0, we want the bars to move DOWN 
-    if ( spectrum_position >= 0.0f ) {
-        y = spectrum_position - cbar_heights[i];
-        draw_bar(y);
+    if ( spectrum_position_vertical >= 0.0f ) {
+        y = spectrum_position_vertical - cbar_heights[i];
+        draw_bar(pos_x1, pos_x2, y);
     } else {
-        y = -spectrum_position - cbar_heights[i];
-        draw_bar(-y);
-    }
-    if ( spectrum_mirror_horizontal ) {
-        // Here the exact reverse to what we did before happens
-        if ( spectrum_position >= 0.0f ) {
-            y = -spectrum_position - cbar_heights[i];
-            draw_bar(-y);
-        } else {
-            y = spectrum_position - cbar_heights[i];
-            draw_bar(y);
-        }
+        y = -spectrum_position_vertical - cbar_heights[i];
+        draw_bar(pos_x1, pos_x2, -y);
     }
 
+    if ( spectrum_mirror_horizontal ) {
+        // Here we do the exact reverse to what we did before
+        if ( spectrum_position_vertical >= 0.0f ) {
+            y = -spectrum_position_vertical - cbar_heights[i];
+            draw_bar(pos_x1, pos_x2, -y);
+        } else {
+            y = spectrum_position_vertical - cbar_heights[i];
+            draw_bar(pos_x1, pos_x2, y);
+        }
+    }
 }
 
 void Spectrum::draw_spectrum() {

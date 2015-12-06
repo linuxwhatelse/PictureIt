@@ -20,10 +20,10 @@ class Spectrum {
         ~Spectrum();
 
         float  spectrum_width             = 1.0f;   // Value ranging from 0.0f to 1.0f
-        float  spectrum_position          = 1.0f;   // Value ranging from -1.0f to 1.0f
-                                                    // -1.0f = The very top
-                                                    //  0.0f = Center
-                                                    //  1.0f = The very bottom
+
+        float  spectrum_position_vertical   = 1.0f;
+        float  spectrum_position_horizontal = 0.0f;
+        
         float  spectrum_animation_speed   = 0.007f; // The smaler the value, the slower and smoother the animation
         bool   spectrum_mirror_vertical   = true;   // If the spectrum should be mirror vertically
         bool   spectrum_mirror_horizontal = false;  // If the spectrum should be mirror horizontally
