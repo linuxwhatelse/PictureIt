@@ -21,6 +21,6 @@ class EFXSlide: public EFXBase {
         EFXSlide();
         ~EFXSlide();
 
-        void configure(const char *key, int value);
+        void configure(const char *key, void *value);
         bool render(GLuint old_texture, GLuint new_texture);
 };

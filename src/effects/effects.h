@@ -37,7 +37,7 @@ class EFXBase {
         EFXBase();
         ~EFXBase();
 
-        virtual void configure(const char *key, int value) = 0;
+        virtual void configure(const char *key, void *value) = 0;
         virtual bool render(GLuint old_texture, GLuint new_texture) = 0;
 
         /*!
@@ -76,3 +76,4 @@ class EFXBase {
 // Include all available effects here
 #include "crossfade.h"
 #include "slide.h"
+#include "flip.h"

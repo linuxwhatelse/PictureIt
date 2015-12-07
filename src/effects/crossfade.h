@@ -13,6 +13,6 @@ class EFXCrossfade: public EFXBase {
         int     fade_offset_ms  =    0;     // Used in combination with "fade_time_ms" to calculate the new alpha value for the next frame
 
     public:
-        void configure(const char *key, int value);
+        void configure(const char *key, void *value);
         bool render(GLuint old_texture, GLuint new_texture);
 };

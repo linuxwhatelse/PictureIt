@@ -28,9 +28,9 @@ EFXSlide::~EFXSlide() {
     delete [] br; 
 }
 
-void EFXSlide::configure(const char *key, int value) {
+void EFXSlide::configure(const char *key, void *value) {
     if ( strcmp( key, "slide_time_ms") == 0 )
-        slide_time_ms = value;
+        slide_time_ms = *(int*) value;
 }
 
 bool EFXSlide::render(GLuint old_texture, GLuint new_texture) {

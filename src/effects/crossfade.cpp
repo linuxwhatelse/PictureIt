@@ -3,9 +3,9 @@
 
 #include <cstring>
 
-void EFXCrossfade::configure(const char *key, int value) {
+void EFXCrossfade::configure(const char *key, void *value) {
     if ( strcmp( key, "fade_time_ms") == 0 )
-        fade_time_ms = value;
+        fade_time_ms = *(int*) value;
 }
 
 bool EFXCrossfade::render(GLuint old_texture, GLuint new_texture) {
