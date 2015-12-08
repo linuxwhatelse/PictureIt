@@ -36,20 +36,47 @@ class PictureIt : public Spectrum {
         const char* get_next_image();
 
     public:
-        EFXBase  *efx = NULL;
+        /*!
+         * @brief Pointer to the currently active effect used to transition between images
+         * See :set_img_transition_efx: on how to change it
+         */
+        EFXBase *efx = NULL;
 
-        // Values that can be configured by whoever implements PictureIt
-        // Note that the :Spectrum: class (which we inherit from) exposes configurable values
-        // all prefixed with "spectrum_*"
-        int    window_width            = 0;
-        int    window_height           = 0;
-        bool   img_pick_random         = true;
-        bool   img_update_by_interval  = true;
-        int    img_update_interval     = 180;
+        /*!
+         * @brief Width in pixel of the window rendering this visualization
+         */
+        int window_width = 0;
 
-        bool   spectrum_enabled        = true;
+        /*!
+         * @brief Height in pixel of the window rendering this visualization
+         */
+        int window_height = 0;
 
-        
+        /*!
+         * @brief If a random images should be picked everytime the image updates
+         * If set to :false: the images will be displayed in alphabetical order
+         */
+        bool img_pick_random = true;
+
+        /*!
+         * @brief Whether the images should be updated by intervall or not
+         */
+        bool img_update_by_interval = true;
+
+        /*!
+         * @brief Image update interval in seconds
+         */
+        int img_update_interval = 180;
+
+        /*!
+         * @brief Whether the spectrum should be enabled or not
+         */
+        bool spectrum_enabled = true;
+
+        /*!
+         * @brief Create a new instance of PictureIt
+         * @param spectrum_bar_count Amount of bars the spectrum should have. This excludes the mirrored parts
+         */
         PictureIt(int spectrum_bar_count = 64): Spectrum(spectrum_bar_count) {
             set_img_transition_efx(img_transition_efx);
             glGenTextures(2, img_texture_ids);

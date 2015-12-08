@@ -16,23 +16,73 @@ class Spectrum {
                                     //   spectrum_colors[3*pos+2] = b;
 
     public:
+        /*!
+         * @brief Create a new instance of the Spectrum
+         * @param spectrum_bar_count Amount of bars the spectrum should have. This excludes the mirrored parts
+         */
         Spectrum(int spectrum_bar_count);
         ~Spectrum();
 
-        float  spectrum_width             = 1.0f;   // Value ranging from 0.0f to 1.0f
+        /*!
+         * @brief Width of the spectrum ranging from 0.0f to 1.0f
+         */
+        float spectrum_width = 1.0f;
 
-        float  spectrum_position_vertical   = 1.0f;
-        float  spectrum_position_horizontal = 0.0f;
+        /*!
+         * @brief Vertical position of the spectrum ranging from -1.0f (the very top) to 1.0f (the very bottom)
+         * @details The position can go beyond -1.0f and 1.0f which would move the spectrum outside the visible boundaries
+         */
+        float spectrum_position_vertical = 1.0f;
+
+        /*!
+         * @brief Horizontal position of the spectrum ranging from -1.0f to 1.0f where the center of the spectrum is the anchor point.
+         * This means that setting the position to -1.0f still shows half of the spectrum in screen
+         * @details The position can go beyond -1.0f and 1.0f which would move the spectrum outside the visible boundaries
+         */
+        float spectrum_position_horizontal = 0.0f;
         
-        float  spectrum_animation_speed   = 0.007f; // The smaler the value, the slower and smoother the animation
-        bool   spectrum_mirror_vertical   = true;   // If the spectrum should be mirror vertically
-        bool   spectrum_mirror_horizontal = false;  // If the spectrum should be mirror horizontally
+        /*!
+         * @brief Animation speed of the spectrum
+         * @details the smaler the value, the slower but smoother the animation
+         */
+        float spectrum_animation_speed = 0.007f;
 
+        /*!
+         * @brief Whether the spectrum should be mirror on the vertical axis or not
+         */
+        bool spectrum_mirror_vertical = true;   // If the spectrum should be mirror vertically
+
+        /*!
+         * @brief Whether the spectrum should be mirror on the horizontal axis or not
+         */
+        bool spectrum_mirror_horizontal = false;  // If the spectrum should be mirror horizontally
+
+        /*!
+         * @brief Draws the spectrum and takes all previously defined values into account
+         */
         void draw_spectrum();
-        void draw_bar( int i, GLfloat x1, GLfloat x2 );
 
+        /*!
+         * @brief Draws a single bar at a specified position (including the mirrored components if enabled)
+         * @param i As the height is defined by the audio data received, :i: has to represent a valid index of :bar_heights:
+         * @param pos_x1 The starting point of the bar (the left side)
+         * @param pos_x2 The end point of the bar (the right side)
+         */
+        void draw_bar( int i, GLfloat pos_x1, GLfloat pos_x2 );
+
+        /*!
+         * @brief Takes raw audio data and applies both windowing and FFT
+         * @param audio_data Array of floats holding the raw audio data
+         * @param audio_data_length length of :audio_data:
+         */
         void audio_data( const float *audio_data, int audio_data_length );
 
-        void set_bar_color( int pos, int r, int g, int b );
+        /*!
+         * @brief Sets the color for a indiviudal bar
+         * @param pos The bar position from left to right starting from 0 up to :spectrum_bar_count: defined with the constructor
+         * @param Amount of red ranging from 0.0f to 1.0f
+         * @param Amount of green ranging from 0.0f to 1.0f
+         * @param Amount of blue ranging from 0.0f to 1.0f
+         */
         void set_bar_color( int pos, float r, float g, float b );
 };

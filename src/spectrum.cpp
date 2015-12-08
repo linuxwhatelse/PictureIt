@@ -157,9 +157,6 @@ void Spectrum::draw_spectrum() {
     glPopMatrix();
 }
 
-void Spectrum::set_bar_color( int pos, int r, int g, int b ) {
-    set_bar_color(pos, r * 1.0f / 255, g * 1.0f / 255, b * 1.0f / 255);
-}
 void Spectrum::set_bar_color( int pos, float r, float g, float b ) {
     this->spectrum_colors[ 3*pos ]   = r;
     this->spectrum_colors[ 3*pos+1 ] = g;
