@@ -5,7 +5,6 @@
 enum class EFX {
     CROSSFADE,
     SLIDE,
-    FLIP,
 };
 
 enum class MODE {
@@ -122,4 +121,3 @@ class EFXBase {
 // Include all available effects here
 #include "crossfade.h"
 #include "slide.h"
-#include "flip.h"
