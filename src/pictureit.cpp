@@ -30,10 +30,6 @@ bool PictureIt::set_img_transition_efx(EFX efx) {
             this->efx = new EFXSlide();
             img_transition_efx = EFX::SLIDE;
             break;
-        case EFX::FLIP:
-            this->efx = new EFXFlip();
-            img_transition_efx = EFX::FLIP;
-            break;
     }
 
     //this->efx->new_image_width  = image_width;
