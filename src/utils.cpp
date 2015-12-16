@@ -12,23 +12,23 @@
 #include "stb_image.h"
 
 namespace PI_UTILS {
-    const char* path_join(string a, string b) {
+    string path_join(string a, string b) {
         // Apparently Windows does understand a "/" just fine...
         // Haven't tested it though, but for now I'm just believing it
     
-        // a ends with "/"
+        // a ends with "/" so lets remove it
         if ( a.substr( a.length() - 1, a.length() ) == "/" )
             a = a.substr( 0, a.size() - 1 );
     
-        // b starts with "/"
+        // b starts with "/" so lets remove it
         if ( b.substr( 0, 1 ) == "/" )
             b = b.substr( 1, b.size() );
     
-        // b ends with "/"
+        // b ends with "/" so lets remove it
         if ( b.substr( b.length() - 1, b.length() ) == "/" )
             b = b.substr( 0, b.size() -1 );
-    
-        return ( a + "/" + b ).c_str();
+
+        return a + "/" + b;
     }
     
     bool list_dir(const char *path, vector<string> &store, bool recursive, bool incl_full_path, const char *file_filter[], int filter_size) {
@@ -46,11 +46,12 @@ namespace PI_UTILS {
             name = entry->d_name;
     
             if ( entry->d_type == DT_DIR && name && name[0] != '.' ) {
-                if ( ! file_filter )
+                if ( ! file_filter ) {
                     add = true;
+                }
     
                 if ( recursive )
-                    PI_UTILS::list_dir( PI_UTILS::path_join( p, name), store, recursive, incl_full_path, file_filter, filter_size );
+                    PI_UTILS::list_dir( PI_UTILS::path_join( p, name).c_str(), store, recursive, incl_full_path, file_filter, filter_size );
             } else if ( entry->d_type != DT_DIR && name && name[0] != '.' ) {
                 if ( file_filter ) {
                     for ( unsigned int i = 0; i < filter_size / sizeof( file_filter[0] ); i++) {
@@ -63,10 +64,11 @@ namespace PI_UTILS {
             }
     
             if ( add ) {
-                if ( incl_full_path )
-                    store.push_back( PI_UTILS::path_join( p, name ) );
-                else
+                if ( incl_full_path ) {
+                    store.push_back( PI_UTILS::path_join( p, name ).c_str() );
+                } else {
                     store.push_back( name );
+                }
                 add = false;
             }
         }
@@ -76,30 +78,34 @@ namespace PI_UTILS {
     }
 
     bool load_image(const char *img_path, GLuint texture_id, int &width, int &height) {
-        if ( ! texture_id )
+        if ( ! texture_id ) {
             return false;
-    
+        }
+
         int x, y, n;
         unsigned char *data = stbi_load(img_path, &x, &y, &n, 0);
     
         width = x;
         height = y;
 
-        if(data == nullptr)
+        if(data == nullptr) {
             return false;
+        }
     
-        glBindTexture(GL_TEXTURE_2D, texture_id);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-    
+        glEnable(GL_TEXTURE_2D);
+            glBindTexture(GL_TEXTURE_2D, texture_id);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        
+            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,  GL_LINEAR );
+            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,  GL_LINEAR );
+            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,      GL_CLAMP_TO_EDGE );
+            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,      GL_CLAMP_TO_EDGE );
+        
+            glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+        glDisable(GL_TEXTURE_2D);
+
         stbi_image_free(data);
-    
-        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,  GL_LINEAR );
-        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,  GL_LINEAR );
-        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,      GL_CLAMP_TO_EDGE );
-        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,      GL_CLAMP_TO_EDGE );
-    
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-    
+
         return true;
     }
 }

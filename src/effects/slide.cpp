@@ -103,14 +103,14 @@ void EFXSlide::left_to_right(GLuint old_texture, GLuint new_texture) {
     tr[0] =  1.0f + pos_current;
     bl[0] = -1.0f + pos_current;
     br[0] =  1.0f + pos_current;
-    draw_image( old_texture, tl, tr, bl, br);
+    draw_image( old_texture, false, tl, tr, bl, br);
 
     // Slide in new image
     tl[0] = -3.0f + pos_current;
     tr[0] = -1.0f + pos_current;
     bl[0] = -3.0f + pos_current;
     br[0] = -1.0f + pos_current;
-    draw_image( new_texture, tl, tr, bl, br);
+    draw_image( new_texture, true, tl, tr, bl, br);
 };
 
 void EFXSlide::right_to_left(GLuint old_texture, GLuint new_texture) {
@@ -119,14 +119,14 @@ void EFXSlide::right_to_left(GLuint old_texture, GLuint new_texture) {
     tr[0] =  1.0f - pos_current;
     bl[0] = -1.0f - pos_current;
     br[0] =  1.0f - pos_current;
-    draw_image( old_texture, tl, tr, bl, br);
+    draw_image( old_texture, false, tl, tr, bl, br);
 
     // Slide in new image
     tl[0] = 1.0f - pos_current;
     tr[0] = 3.0f - pos_current;
     bl[0] = 1.0f - pos_current;
     br[0] = 3.0f - pos_current;
-    draw_image( new_texture, tl, tr, bl, br);
+    draw_image( new_texture, true, tl, tr, bl, br);
 };
 
 void EFXSlide::top_to_bottom(GLuint old_texture, GLuint new_texture) {
@@ -135,14 +135,14 @@ void EFXSlide::top_to_bottom(GLuint old_texture, GLuint new_texture) {
     tr[1] = -1.0f + pos_current;
     bl[1] =  1.0f + pos_current;
     br[1] =  1.0f + pos_current;
-    draw_image( old_texture, tl, tr, bl, br);
+    draw_image( old_texture, false, tl, tr, bl, br);
 
     // Slide in new image
     tl[1] = -3.0f + pos_current;
     tr[1] = -3.0f + pos_current;
     bl[1] = -1.0f + pos_current;
     br[1] = -1.0f + pos_current;
-    draw_image( new_texture, tl, tr, bl, br);
+    draw_image( new_texture, true, tl, tr, bl, br);
 };
 
 void EFXSlide::bottom_to_top(GLuint old_texture, GLuint new_texture) {
@@ -151,12 +151,12 @@ void EFXSlide::bottom_to_top(GLuint old_texture, GLuint new_texture) {
     tr[1] = -1.0f - pos_current;
     bl[1] =  1.0f - pos_current;
     br[1] =  1.0f - pos_current;
-    draw_image( old_texture, tl, tr, bl, br);
+    draw_image( old_texture, false, tl, tr, bl, br);
 
     // Slide in new image
     tl[1] = 1.0f - pos_current;
     tr[1] = 1.0f - pos_current;
     bl[1] = 3.0f - pos_current;
     br[1] = 3.0f - pos_current;
-    draw_image( new_texture, tl, tr, bl, br);
+    draw_image( new_texture, true, tl, tr, bl, br);
 };

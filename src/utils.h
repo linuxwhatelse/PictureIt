@@ -14,7 +14,7 @@ namespace PI_UTILS {
      * @param b secondary path that should be added to :a:
      * @return path combined from :a: and :b:
      */
-    const char* path_join(string a, string b);
+    string path_join(string a, string b);
 
     /*!
      * @brief List a directories content

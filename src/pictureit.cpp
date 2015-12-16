@@ -30,10 +30,14 @@ bool PictureIt::set_img_transition_efx(EFX efx) {
             this->efx = new EFXSlide();
             img_transition_efx = EFX::SLIDE;
             break;
+        case EFX::FLIP:
+            this->efx = new EFXFlip();
+            img_transition_efx = EFX::FLIP;
+            break;
     }
 
-    this->efx->image_width  = image_width;
-    this->efx->image_height = image_height;
+    //this->efx->new_image_width  = image_width;
+    //this->efx->new_image_height = image_height;
 
     return true;
 };
@@ -104,6 +108,9 @@ bool PictureIt::render() {
             else
                 img_path = get_next_image();
 
+            efx->old_image_width  = efx->new_image_width;
+            efx->old_image_height = efx->new_image_height;
+
             bool success = PI_UTILS::load_image( img_path, img_texture_ids[1], image_width, image_height );
             if ( ! success ) {
                 // Faild loading image, so when drawing the next frame we immediatelly try to get a new one
@@ -111,8 +118,8 @@ bool PictureIt::render() {
                 // if only broken images are available within a preset
                 img_update = true;
             } else {
-                efx->image_width  = image_width;
-                efx->image_height = image_height;
+                efx->new_image_width  = image_width;
+                efx->new_image_height = image_height;
             }
         }
 
@@ -123,7 +130,7 @@ bool PictureIt::render() {
         if ( img_effect_finished ) {
             // From now on we keep drawing the current image ourself up to the point
             // where a new image will be displayed which will be done by an effect again
-            efx->draw_image(img_texture_ids[0]);
+            efx->draw_image(img_texture_ids[0], true);
         } else {
             if ( glIsTexture(img_texture_ids[0]) )
                 img_effect_finished = efx->render(img_texture_ids[0], img_texture_ids[1]);
@@ -137,13 +144,14 @@ bool PictureIt::render() {
                 // e.g. Kodi needs that. Without it, it looks like one frame is missing once
                 // the effect finished.
                 // It doesn't hurt so it's fine for now
-                efx->draw_image(img_texture_ids[0]);
+                efx->draw_image(img_texture_ids[0], true);
             }
         }
     }
 
-    if ( spectrum_enabled )
+    if ( spectrum_enabled ) {
         draw_spectrum();
+    }
 
     finish_render();
 
@@ -160,8 +168,8 @@ void PictureIt::update_image(bool force_update) {
 
 void PictureIt::load_images(const char *image_root_dir) {
     img_current_index = -1;
-
     images.clear();
+
     PI_UTILS::list_dir(image_root_dir, images, true, true, image_filter, sizeof(image_filter));
     sort(images.begin(), images.end());
 }

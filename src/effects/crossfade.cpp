@@ -27,10 +27,10 @@ bool EFXCrossfade::render(GLuint old_texture, GLuint new_texture) {
             fade_last = fade_current;
 
         // Fade out old image
-        draw_image( old_texture, NULL, NULL, NULL, NULL, 1.0f - fade_current );
+        draw_image( old_texture, false, NULL, NULL, NULL, NULL, 1.0f - fade_current );
 
         // Fade in new image
-        draw_image( new_texture,  NULL, NULL, NULL, NULL, fade_current );
+        draw_image( new_texture, true, NULL, NULL, NULL, NULL, fade_current );
 
         return false;
     }
