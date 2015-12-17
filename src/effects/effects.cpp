@@ -86,47 +86,45 @@ void EFXBase::draw_image(GLuint texture_id, bool is_new_image, GLfloat top_left[
         this->br[1] = 1.0f;
     }
 
-    glPushMatrix();
-        glEnable( GL_TEXTURE_2D );
-        glEnable( GL_BLEND );
+    glEnable( GL_TEXTURE_2D );
+    glEnable( GL_BLEND );
 
-        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
-        glBindTexture( GL_TEXTURE_2D, texture_id );
+    glBindTexture( GL_TEXTURE_2D, texture_id );
 
-        glColor4f( 1.0f, 1.0f, 1.0f, opacity );
+    glColor4f( 1.0f, 1.0f, 1.0f, opacity );
 
-        if ( this->window_width && this->window_height && this->image_width && this->image_height ) {
-            switch (image_mode) {
-                case MODE::CENTER:
-                    img_mode_center();
-                    break;
-                case MODE::ZOOM:
-                    img_mode_zoom();
-                    break;
-                case MODE::SCALE:
-                    img_mode_scale();
-                    break;
-                case MODE::STRETCH:
-                    // Stretching doesn't need "special" values, therefore we do nothing
-                    break;
-            }
+    if ( this->window_width && this->window_height && this->image_width && this->image_height ) {
+        switch (image_mode) {
+            case MODE::CENTER:
+                img_mode_center();
+                break;
+            case MODE::ZOOM:
+                img_mode_zoom();
+                break;
+            case MODE::SCALE:
+                img_mode_scale();
+                break;
+            case MODE::STRETCH:
+                // Stretching doesn't need "special" values, therefore we do nothing
+                break;
         }
+    }
 
-        glBegin( GL_TRIANGLES );
-            glTexCoord2f( this->tex_tl[0], this->tex_tl[1] ); glVertex2f( this->tl[0], this->tl[1] );  // Top Left
-            glTexCoord2f( this->tex_tr[0], this->tex_tr[1] ); glVertex2f( this->tr[0], this->tr[1] );  // Top Right
-            glTexCoord2f( this->tex_br[0], this->tex_br[1] ); glVertex2f( this->br[0], this->br[1] );  // Bottom Right
-        glEnd();
-        glBegin( GL_TRIANGLES );
-            glTexCoord2f( this->tex_br[0], this->tex_br[1] ); glVertex2f( this->br[0], this->br[1] );  // Bottom Right
-            glTexCoord2f( this->tex_bl[0], this->tex_bl[1] ); glVertex2f( this->bl[0], this->bl[1] );  // Bottom Left
-            glTexCoord2f( this->tex_tl[0], this->tex_tl[1] ); glVertex2f( this->tl[0], this->tl[1] );  // Top Left
-        glEnd();
+    glBegin( GL_TRIANGLES );
+        glTexCoord2f( this->tex_tl[0], this->tex_tl[1] ); glVertex2f( this->tl[0], this->tl[1] );  // Top Left
+        glTexCoord2f( this->tex_tr[0], this->tex_tr[1] ); glVertex2f( this->tr[0], this->tr[1] );  // Top Right
+        glTexCoord2f( this->tex_br[0], this->tex_br[1] ); glVertex2f( this->br[0], this->br[1] );  // Bottom Right
+    glEnd();
+    glBegin( GL_TRIANGLES );
+        glTexCoord2f( this->tex_br[0], this->tex_br[1] ); glVertex2f( this->br[0], this->br[1] );  // Bottom Right
+        glTexCoord2f( this->tex_bl[0], this->tex_bl[1] ); glVertex2f( this->bl[0], this->bl[1] );  // Bottom Left
+        glTexCoord2f( this->tex_tl[0], this->tex_tl[1] ); glVertex2f( this->tl[0], this->tl[1] );  // Top Left
+    glEnd();
 
-        glDisable( GL_TEXTURE_2D );
-        glDisable( GL_BLEND );
-    glPopMatrix();
+    glDisable( GL_TEXTURE_2D );
+    glDisable( GL_BLEND );
 }
 
 void EFXBase::img_mode_center() {
