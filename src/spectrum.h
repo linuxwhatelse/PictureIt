@@ -50,12 +50,23 @@ class Spectrum {
         /*!
          * @brief Whether the spectrum should be mirror on the vertical axis or not
          */
-        bool spectrum_mirror_vertical = true;   // If the spectrum should be mirror vertically
+        bool spectrum_mirror_vertical = true;
 
         /*!
          * @brief Whether the spectrum should be mirror on the horizontal axis or not
          */
-        bool spectrum_mirror_horizontal = false;  // If the spectrum should be mirror horizontally
+        bool spectrum_mirror_horizontal = false;
+
+        /*!
+         * @brief Whether the spectrum should be fliped on the vertical axis or not
+         */
+        bool spectrum_flip_vertical = false;
+
+        /*!
+         * @brief Whether the spectrum should be flipped on the horizontal axis or not
+         */
+        bool spectrum_flip_horizontal = false;
+
 
         /*!
          * @brief Draws the spectrum and takes all previously defined values into account
