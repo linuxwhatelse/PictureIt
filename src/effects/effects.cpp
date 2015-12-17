@@ -133,33 +133,53 @@ void EFXBase::img_mode_center() {
     GLfloat diff_width  = 1.0f - ( (float)this->image_width  / (float)this->window_width  );
     GLfloat diff_height = 1.0f - ( (float)this->image_height / (float)this->window_height );
 
-    this->tl[0] = this->tl[0] + diff_width;
-    this->tr[0] = this->tr[0] - diff_width;
-    this->bl[0] = this->bl[0] + diff_width;
-    this->br[0] = this->br[0] - diff_width;
-
-    this->tl[1] = this->tl[1] + diff_height;
-    this->tr[1] = this->tr[1] + diff_height;
-    this->bl[1] = this->bl[1] - diff_height;
-    this->br[1] = this->br[1] - diff_height;
-}
-
-void EFXBase::img_mode_scale() {
-    int scaled_image_width = this->image_width * ( (float)this->window_height / (float)this->image_height );
-    GLfloat diff_width  = 1.0f - ( (float)scaled_image_width / (float)this->window_width );
-
-    if ( diff_width >= 0.0f) {
+    if ( this->window_width > this->image_width ) {
         this->tl[0] = this->tl[0] + diff_width;
         this->tr[0] = this->tr[0] - diff_width;
         this->bl[0] = this->bl[0] + diff_width;
         this->br[0] = this->br[0] - diff_width;
     } else {
-        GLfloat tex_offset = ( (float)this->image_width / (float)this->image_height ) - ( (float)this->window_width / (float)this->window_height );
-        // Zoom the texture width
+        float overflow = (float)this->image_width - (float)this->window_width;
+        GLfloat diff = (overflow / this->image_width) / 2;
 
-        float ratio_img = (float)this->image_width / (float)this->image_height;
-        float ratio_win = (float)this->window_width / (float)this->window_height;
+        this->tex_tl[0] = this->tex_tl[0] + diff;
+        this->tex_tr[0] = this->tex_tr[0] - diff;
+        this->tex_bl[0] = this->tex_bl[0] + diff;
+        this->tex_br[0] = this->tex_br[0] - diff;
+    }
+
+    if ( this->window_height > this->image_height ) {
+        this->tl[1] = this->tl[1] + diff_height;
+        this->tr[1] = this->tr[1] + diff_height;
+        this->bl[1] = this->bl[1] - diff_height;
+        this->br[1] = this->br[1] - diff_height;
+    } else {
+        float overflow = (float)this->image_height - (float)this->window_height;
+        GLfloat diff = (overflow / this->image_height) / 2;
+
+        this->tex_tl[1] = this->tex_tl[1] + diff;
+        this->tex_tr[1] = this->tex_tr[1] + diff;
+        this->tex_bl[1] = this->tex_bl[1] - diff;
+        this->tex_br[1] = this->tex_br[1] - diff;
+    }
+
+}
+
+void EFXBase::img_mode_scale() {
+    float ratio_img = (float)this->image_width  / (float)this->image_height;
+    float ratio_win = (float)this->window_width / (float)this->window_height;
+
+    if ( ratio_win >= ratio_img ) {
+        int scaled_image_width = this->image_width * ( (float)this->window_height / (float)this->image_height );
+        GLfloat diff_width  = 1.0f - ( (float)scaled_image_width / (float)this->window_width );
+
+        this->tl[0] = this->tl[0] + diff_width;
+        this->tr[0] = this->tr[0] - diff_width;
+        this->bl[0] = this->bl[0] + diff_width;
+        this->br[0] = this->br[0] - diff_width;
+    } else {
         GLfloat diff = (ratio_img - ratio_win) / (2 * ratio_img);
+
         this->tex_tl[0] = this->tex_tl[0] + diff;
         this->tex_tr[0] = this->tex_tr[0] - diff;
         this->tex_bl[0] = this->tex_bl[0] + diff;
@@ -168,17 +188,18 @@ void EFXBase::img_mode_scale() {
 }
 
 void EFXBase::img_mode_zoom() {
-    float zoomed_image_height = this->image_height * ( (float)this->window_width / (float)this->image_width );
-    GLfloat diff_height  = 1.0f - ( (float)zoomed_image_height / (float)this->window_height );
+    float ratio_img = (float)this->image_height  / (float)this->image_width;
+    float ratio_win = (float)this->window_height / (float)this->window_width;
 
-    if ( diff_height >= 0.0f ) {
+    if ( ratio_win >= ratio_img ) {
+        float zoomed_image_height = this->image_height * ( (float)this->window_width / (float)this->image_width );
+        GLfloat diff_height  = 1.0f - ( (float)zoomed_image_height / (float)this->window_height );
+
         this->tl[1] = this->tl[1] + diff_height;
         this->tr[1] = this->tr[1] + diff_height;
         this->bl[1] = this->bl[1] - diff_height;
         this->br[1] = this->br[1] - diff_height;
     } else {
-        float ratio_img = (float)this->image_height / (float)this->image_width;
-        float ratio_win = (float)this->window_height / (float)this->window_width;
         GLfloat diff = (ratio_img - ratio_win) / (2 * ratio_img);
 
         this->tex_tl[1] = this->tex_tl[1] + diff;
