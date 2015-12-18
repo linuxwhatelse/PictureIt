@@ -44,10 +44,6 @@ void Spectrum::audio_data(const float *audio_data, int audio_data_length) {
     */
 }
 
-
-// Draw a single bar
-//   i = index of the bar from left to right
-//   x1 + x2 = width and position of the bar
 void Spectrum::draw_bar( int i, GLfloat pos_x1, GLfloat pos_x2 ) {
     if ( ::fabs( cbar_heights[i] - bar_heights[i] ) > 0 ) {
         // The bigger the difference between the current and previous heights, the faster
@@ -99,22 +95,21 @@ void Spectrum::draw_bar( int i, GLfloat pos_x1, GLfloat pos_x2 ) {
     pos_x1 = pos_x1 + spectrum_position_horizontal;
     pos_x2 = pos_x2 + spectrum_position_horizontal;
 
-    if ( this->spectrum_flip_vertical ) {
-        y = spectrum_position_vertical - cbar_heights[i];
-        draw_bar(pos_x1, pos_x2, y);
-    } else {
+    if ( this->spectrum_flip_horizontal ) {
         y = -spectrum_position_vertical - cbar_heights[i];
         draw_bar(pos_x1, pos_x2, -y);
+    } else {
+        y = spectrum_position_vertical - cbar_heights[i];
+        draw_bar(pos_x1, pos_x2, y);
     }
 
     if ( spectrum_mirror_horizontal ) {
-        // Here we do the exact reverse to what we did before
-        if ( spectrum_position_vertical >= 0.0f ) {
-            y = -spectrum_position_vertical - cbar_heights[i];
-            draw_bar(pos_x1, pos_x2, -y);
-        } else {
+        if ( this->spectrum_flip_horizontal ) {
             y = spectrum_position_vertical - cbar_heights[i];
             draw_bar(pos_x1, pos_x2, y);
+        } else {
+            y = -spectrum_position_vertical - cbar_heights[i];
+            draw_bar(pos_x1, pos_x2, -y);
         }
     }
 }
@@ -144,7 +139,7 @@ void Spectrum::draw_spectrum() {
             x1 = x1 + ( bar_width / 4 );
             x2 = x2 - ( bar_width / 4 );
 
-            if ( this->spectrum_flip_horizontal ) {
+            if ( this->spectrum_flip_vertical ) {
                 x1 = -x1;
                 x2 = -x2;
             }
