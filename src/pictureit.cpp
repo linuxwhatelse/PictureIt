@@ -18,6 +18,10 @@ bool PictureIt::set_img_transition_efx(EFX efx) {
     if ( ! img_effect_finished )
         return false;
 
+    MODE image_mode = MODE::ZOOM;
+    if ( this->efx )
+        image_mode = this->efx->image_mode;
+
     delete this->efx;
 
     switch (efx) {
@@ -32,8 +36,10 @@ bool PictureIt::set_img_transition_efx(EFX efx) {
             break;
     }
 
-    //this->efx->new_image_width  = image_width;
-    //this->efx->new_image_height = image_height;
+    this->efx->image_mode = image_mode;
+
+    this->efx->new_image_width  = image_width;
+    this->efx->new_image_height = image_height;
 
     return true;
 };
