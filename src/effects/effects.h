@@ -34,8 +34,10 @@ class EFXBase {
         void img_mode_scale();
 
     public:
+        /*!
+         * @brief The mode that should be used to scale the image
+         */
         MODE image_mode   = MODE::ZOOM;
-
 
         /*!
          * @brief Width in pixel of the window rendering this visualization
