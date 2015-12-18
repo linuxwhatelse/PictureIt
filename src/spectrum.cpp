@@ -73,11 +73,10 @@ void Spectrum::draw_bar( int i, GLfloat pos_x1, GLfloat pos_x2 ) {
             glVertex2f( x1, y );                           // Top Left
         glEnd();
 
-        if ( spectrum_mirror_vertical ) {
+        if ( spectrum_mirror_horizontal ) {
             x1 = x1 - ( spectrum_position_horizontal * 2 );
             x2 = x2 - ( spectrum_position_horizontal * 2 );
 
-            // This is the mirrored part on the right side
             glBegin(GL_TRIANGLES);
                 glVertex2f( -x2, y );                           // Top Left
                 glVertex2f( -x1, y );                           // Top Right
@@ -95,7 +94,7 @@ void Spectrum::draw_bar( int i, GLfloat pos_x1, GLfloat pos_x2 ) {
     pos_x1 = pos_x1 + spectrum_position_horizontal;
     pos_x2 = pos_x2 + spectrum_position_horizontal;
 
-    if ( this->spectrum_flip_horizontal ) {
+    if ( this->spectrum_flip_vertical ) {
         y = -spectrum_position_vertical - cbar_heights[i];
         draw_bar(pos_x1, pos_x2, -y);
     } else {
@@ -103,8 +102,8 @@ void Spectrum::draw_bar( int i, GLfloat pos_x1, GLfloat pos_x2 ) {
         draw_bar(pos_x1, pos_x2, y);
     }
 
-    if ( spectrum_mirror_horizontal ) {
-        if ( this->spectrum_flip_horizontal ) {
+    if ( spectrum_mirror_vertical ) {
+        if ( this->spectrum_flip_vertical ) {
             y = spectrum_position_vertical - cbar_heights[i];
             draw_bar(pos_x1, pos_x2, y);
         } else {
@@ -121,7 +120,7 @@ void Spectrum::draw_spectrum() {
     glPushMatrix();
         GLfloat x1, x2, bar_width;
 
-        if ( spectrum_mirror_vertical )
+        if ( spectrum_mirror_horizontal )
             bar_width = spectrum_width / spectrum_bar_count;
         else
             // Because the coord-system goes from -1.0 to 1.0, we have
@@ -139,7 +138,7 @@ void Spectrum::draw_spectrum() {
             x1 = x1 + ( bar_width / 4 );
             x2 = x2 - ( bar_width / 4 );
 
-            if ( this->spectrum_flip_vertical ) {
+            if ( this->spectrum_flip_horizontal ) {
                 x1 = -x1;
                 x2 = -x2;
             }
