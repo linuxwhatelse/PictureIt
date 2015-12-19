@@ -31,7 +31,7 @@ class EFXSlide: public EFXBase {
         GLfloat *bl;  // The images bottom left corner position
         GLfloat *br;  // The images bottom right corner position
 
-        void random(int direction, GLuint old_texture, GLuint new_texture);
+        void slide(int direction, GLuint old_texture, GLuint new_texture);
         void left_to_right(GLuint old_texture, GLuint new_texture);
         void right_to_left(GLuint old_texture, GLuint new_texture);
         void top_to_bottom(GLuint old_texture, GLuint new_texture);

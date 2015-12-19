@@ -55,22 +55,10 @@ bool EFXSlide::render(GLuint old_texture, GLuint new_texture) {
         } else
             this->pos_last = this->pos_current;
 
-        switch ( this->slide_direction ) {
-            case 0:
-                left_to_right( old_texture, new_texture );
-                break;
-            case 1:
-                right_to_left( old_texture, new_texture );
-                break;
-            case 2:
-                top_to_bottom( old_texture, new_texture );
-                break;
-            case 3:
-                bottom_to_top( old_texture, new_texture );
-                break;
-            case 4:
-                random( random_direction, old_texture, new_texture );
-                break;
+        if ( this->slide_direction == 4 ) {
+            slide( random_direction, old_texture, new_texture );
+        } else {
+            slide( this->slide_direction, old_texture, new_texture );
         }
 
         return false;
@@ -81,7 +69,7 @@ bool EFXSlide::render(GLuint old_texture, GLuint new_texture) {
     return true;
 }
 
-void EFXSlide::random(int direction, GLuint old_texture, GLuint new_texture) {
+void EFXSlide::slide(int direction, GLuint old_texture, GLuint new_texture) {
     switch ( direction ) {
         case 0:
             left_to_right( old_texture, new_texture );
