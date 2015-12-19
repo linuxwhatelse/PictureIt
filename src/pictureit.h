@@ -78,8 +78,8 @@ class PictureIt : public Spectrum {
          * @param spectrum_bar_count Amount of bars the spectrum should have. This excludes the mirrored parts
          */
         PictureIt(int spectrum_bar_count = 64): Spectrum(spectrum_bar_count) {
-            set_img_transition_efx(img_transition_efx);
-            glGenTextures(2, img_texture_ids);
+            set_img_transition_efx(this->img_transition_efx);
+            glGenTextures(2, this->img_texture_ids);
         };
 
         ~PictureIt();

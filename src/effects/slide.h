@@ -7,7 +7,7 @@ class EFXSlide: public EFXBase {
         /*!
          * @brief Time in milliseconds the fade effect should take
         */
-        int     slide_time_ms    =    2500;
+        int slide_time_ms = 2500;
 
         /*!
          * @biref Defines the direction to slide in/out new/old images
@@ -17,7 +17,7 @@ class EFXSlide: public EFXBase {
          * 3 = bottom to top
          * 4 = random
          */
-        int     slide_direction  =    0;
+        int slide_direction = 0;
 
 
         bool    initial          =  true;  // If this is the first call for the current transition

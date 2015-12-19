@@ -32,7 +32,7 @@ Spectrum::~Spectrum() {
 
 void Spectrum::audio_data(const float *audio_data, int audio_data_length) {
     for(int i = 0; i < spectrum_bar_count; i++)
-        bar_heights[i] = audio_data[i];
+        this->bar_heights[i] = audio_data[i];
     /**
     ToDo: Use a library for FFT and windowing
     - The values in :this->bar_heights: will be used to draw the bars and the values have to be between 0.0f and 1.0f
@@ -49,65 +49,65 @@ void Spectrum::draw_bar( int i, GLfloat pos_x1, GLfloat pos_x2 ) {
         // The bigger the difference between the current and previous heights, the faster
         // we want the bars to move.
         // The "10.0" is a random value I choose after some testing.
-        float gravity = ::fabs( cbar_heights[i] - pbar_heights[i] ) / 10.0;
+        float gravity = ::fabs( this->cbar_heights[i] - this->pbar_heights[i] ) / 10.0;
 
-        if ( cbar_heights[i] < bar_heights[i] )
-            cbar_heights[i] += spectrum_animation_speed + gravity;
+        if ( this->cbar_heights[i] < this->bar_heights[i] )
+            this->cbar_heights[i] += this->spectrum_animation_speed + gravity;
         else
-            cbar_heights[i] -= spectrum_animation_speed + gravity;
+            this->cbar_heights[i] -= this->spectrum_animation_speed + gravity;
     }
 
-    pbar_heights[i] = bar_heights[i];
+    this->pbar_heights[i] = this->bar_heights[i];
 
     auto&& draw_bar = [&](GLfloat x1, GLfloat x2, GLfloat y) {
-        glColor3f( spectrum_colors[ 3*i ], spectrum_colors[ 3*i+1 ], spectrum_colors[ 3*i+2 ] );
+        glColor3f( this->spectrum_colors[ 3*i ], this->spectrum_colors[ 3*i+1 ], this->spectrum_colors[ 3*i+2 ] );
 
         glBegin(GL_TRIANGLES);
             glVertex2f( x1, y );                           // Top Left
             glVertex2f( x2, y );                           // Top Right
-            glVertex2f( x2, spectrum_position_vertical );  // Bottom Right
+            glVertex2f( x2, this->spectrum_position_vertical );  // Bottom Right
         glEnd();
         glBegin(GL_TRIANGLES);
-            glVertex2f( x2, spectrum_position_vertical );  // Bottom Right
-            glVertex2f( x1, spectrum_position_vertical );  // Bottom Left
+            glVertex2f( x2, this->spectrum_position_vertical );  // Bottom Right
+            glVertex2f( x1, this->spectrum_position_vertical );  // Bottom Left
             glVertex2f( x1, y );                           // Top Left
         glEnd();
 
-        if ( spectrum_mirror_horizontal ) {
-            x1 = x1 - ( spectrum_position_horizontal * 2 );
-            x2 = x2 - ( spectrum_position_horizontal * 2 );
+        if ( this->spectrum_mirror_horizontal ) {
+            x1 = x1 - ( this->spectrum_position_horizontal * 2 );
+            x2 = x2 - ( this->spectrum_position_horizontal * 2 );
 
             glBegin(GL_TRIANGLES);
                 glVertex2f( -x2, y );                           // Top Left
                 glVertex2f( -x1, y );                           // Top Right
-                glVertex2f( -x1, spectrum_position_vertical );  // Bottom Right
+                glVertex2f( -x1, this->spectrum_position_vertical );  // Bottom Right
             glEnd();
             glBegin(GL_TRIANGLES);
-                glVertex2f( -x1, spectrum_position_vertical );  // Bottom Right
-                glVertex2f( -x2, spectrum_position_vertical );  // Bottom Left
+                glVertex2f( -x1, this->spectrum_position_vertical );  // Bottom Right
+                glVertex2f( -x2, this->spectrum_position_vertical );  // Bottom Left
                 glVertex2f( -x2, y );                           // Top Left
             glEnd();
         }
     };
 
     GLfloat y;
-    pos_x1 = pos_x1 + spectrum_position_horizontal;
-    pos_x2 = pos_x2 + spectrum_position_horizontal;
+    pos_x1 = pos_x1 + this->spectrum_position_horizontal;
+    pos_x2 = pos_x2 + this->spectrum_position_horizontal;
 
     if ( this->spectrum_flip_vertical ) {
-        y = -spectrum_position_vertical - cbar_heights[i];
+        y = -this->spectrum_position_vertical - this->cbar_heights[i];
         draw_bar(pos_x1, pos_x2, -y);
     } else {
-        y = spectrum_position_vertical - cbar_heights[i];
+        y = this->spectrum_position_vertical - this->cbar_heights[i];
         draw_bar(pos_x1, pos_x2, y);
     }
 
-    if ( spectrum_mirror_vertical ) {
+    if ( this->spectrum_mirror_vertical ) {
         if ( this->spectrum_flip_vertical ) {
-            y = spectrum_position_vertical - cbar_heights[i];
+            y = this->spectrum_position_vertical - this->cbar_heights[i];
             draw_bar(pos_x1, pos_x2, y);
         } else {
-            y = -spectrum_position_vertical - cbar_heights[i];
+            y = -this->spectrum_position_vertical - this->cbar_heights[i];
             draw_bar(pos_x1, pos_x2, -y);
         }
     }
@@ -120,18 +120,18 @@ void Spectrum::draw_spectrum() {
     glPushMatrix();
         GLfloat x1, x2, bar_width;
 
-        if ( spectrum_mirror_horizontal )
-            bar_width = spectrum_width / spectrum_bar_count;
+        if ( this->spectrum_mirror_horizontal )
+            bar_width = this->spectrum_width / this->spectrum_bar_count;
         else
             // Because the coord-system goes from -1.0 to 1.0, we have
             // to take spectrum_width * 2 in case of disabling the mirrored
             // part
-            bar_width = (spectrum_width * 2) / spectrum_bar_count;
+            bar_width = (this->spectrum_width * 2) / this->spectrum_bar_count;
 
         for ( int i = 1; i <= spectrum_bar_count; i++ ) {
             // calculate position
-            x1 = ( spectrum_width * -1 ) + ( i * bar_width ) - bar_width;
-            x2 = ( spectrum_width * -1 ) + ( i * bar_width );
+            x1 = ( this->spectrum_width * -1 ) + ( i * bar_width ) - bar_width;
+            x2 = ( this->spectrum_width * -1 ) + ( i * bar_width );
 
             // "add" a gap (which is 1/4 of the initial bar_width)
             // to both the left and right side of the bar
