@@ -1,7 +1,7 @@
 #pragma once
 
 #include "spectrum.h"
-#include "effects.h"
+#include "effects/effects.h"
 
 #include <string>
 #include <vector>

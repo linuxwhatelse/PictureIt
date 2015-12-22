@@ -1,9 +1,13 @@
 # It defines the following variables
-#   PICTUREIT_INCLUDE_DIR, the path where PictureIt headers are located
-#   PICTUREIT_LIBRARY_DIR, folder in which the PictureIt library is located
-#   PICTUREIT_LIBRARY,     library to link against to use PictureIt
+#   PICTUREIT_INCLUDE_DIR,  the path where PictureIt headers are located
+#   PICTUREIT_INCLUDE_DIRS, the paths where dependency headers are located
+#   PICTUREIT_LIBRARY_DIR,  folder in which the PictureIt library is located
+#   PICTUREIT_LIBRARY,      library to link against to use PictureIt
+#   PICTUREIT_LIBRARIES,    libraries used by PictureIt to link against
 
-set(PICTUREIT_INCLUDE_DIR "@PICTUREIT_INCLUDE_DIR@")
-set(PICTUREIT_LIBRARY_DIR "@PICTUREIT_LIBRARY_DIR@")
+set(PICTUREIT_INCLUDE_DIR  "@PICTUREIT_INCLUDE_DIR@")
+set(PICTUREIT_INCLUDE_DIRS "@PICTUREIT_INCLUDE_DIRS@")
+set(PICTUREIT_LIBRARY_DIR  "@PICTUREIT_LIBRARY_DIR@")
+set(PICTUREIT_LIBRARIES    "@PICTUREIT_LIBRARIES@")
 
 find_library(PICTUREIT_LIBRARY "@PROJECT_NAME@" HINTS ${PICTUREIT_LIBRARY_DIR})
