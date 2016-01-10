@@ -24,24 +24,57 @@ Spectrum::Spectrum(int spectrum_bar_count) {
 }
 
 Spectrum::~Spectrum() {
+    if ( this->vis_processor_initialized && ! this->vis_processor_init_failed ) {
+        this->vis_processor.Destroy();
+    }
+
+    if ( this->vis_audio_data_initialized ) {
+        delete[] this->vis_audio_data;
+    }
+
     delete[] this->bar_heights;
     delete[] this->cbar_heights;
     delete[] this->pbar_heights;
     delete[] this->spectrum_colors;
 }
 
+#include <iostream>
 void Spectrum::audio_data(const float *audio_data, int audio_data_length) {
-    for(int i = 0; i < spectrum_bar_count; i++)
-        this->bar_heights[i] = audio_data[i];
-    /**
-    ToDo: Use a library for FFT and windowing
-    - The values in :this->bar_heights: will be used to draw the bars and the values have to be between 0.0f and 1.0f
-      (1.0f would mean the bar goes all the way up to the screen meaning we should define a max value)
-    - :this->spectrum_bar_count: tells us how many bars will be drawn
-    - :this->cbar_heights / this->pbar_heights: are used by :draw_spectrum: to smoothen the animation and shall NOT be used here
+    // When we get called the first time, we create a new array holding the same values
+    // as :audio_data: as we need a non const version of it
+    if ( ! this->vis_audio_data_initialized ) {
+        this->frame_size = audio_data_length / sizeof(audio_data[0]);
 
-    So all that this function has to do is write proper values into :this->bar_heights: whenever it gets called
-    */
+        this->vis_audio_data = new float[this->frame_size]();
+        this->vis_audio_data_initialized = true;
+    }
+
+    // When we get called the first time, we create a vis_processor instance
+    if ( ! this->vis_processor_initialized && ! this->vis_processor_init_failed ) {
+        if ( this->vis_processor.Create( this->vis_processor_configurator, this->frame_size ) != ASPLIB_ERR_NO_ERROR ) {
+            this->vis_processor_init_failed = true;
+        }
+        this->vis_processor_initialized = true;
+    }
+
+    // Processor was initialized successfully
+    if ( this->vis_processor_initialized && ! this->vis_processor_init_failed ) {
+        std::copy_n( audio_data, this->frame_size, this->vis_audio_data );
+
+        this->vis_processor.Process( this->vis_audio_data, this->vis_audio_data );
+
+        for ( int i = 0; i < spectrum_bar_count; i++ ) {
+            this->vis_audio_data[i] = (float)this->vis_audio_data[i] / 10.0f;
+            //if ( this->vis_audio_data[i] < 0.02f ) {
+            //    this->vis_audio_data[i] = 0.01f;
+            //}
+
+            this->bar_heights[i] = this->vis_audio_data[i];
+        }
+    } else {
+        // Here we would need some form of fallback values to display as
+        // initializing the processor failed
+    }
 }
 
 void Spectrum::draw_bar( int i, GLfloat pos_x1, GLfloat pos_x2 ) {
@@ -56,7 +89,6 @@ void Spectrum::draw_bar( int i, GLfloat pos_x1, GLfloat pos_x2 ) {
         else
             this->cbar_heights[i] -= this->spectrum_animation_speed + gravity;
     }
-
     this->pbar_heights[i] = this->bar_heights[i];
 
     auto&& draw_bar = [&](GLfloat x1, GLfloat x2, GLfloat y) {
@@ -118,15 +150,16 @@ void Spectrum::draw_spectrum() {
     // This ensures the exact same height-value for both
     // the left and the (mirrored) right bar
     glPushMatrix();
-        GLfloat x1, x2, bar_width;
+        GLfloat x1, x2, bar_width, gap;
 
-        if ( this->spectrum_mirror_horizontal )
+        if ( this->spectrum_mirror_horizontal ) {
             bar_width = this->spectrum_width / this->spectrum_bar_count;
-        else
+        } else {
             // Because the coord-system goes from -1.0 to 1.0, we have
             // to take spectrum_width * 2 in case of disabling the mirrored
             // part
             bar_width = (this->spectrum_width * 2) / this->spectrum_bar_count;
+        }
 
         for ( int i = 1; i <= spectrum_bar_count; i++ ) {
             // calculate position
@@ -135,8 +168,9 @@ void Spectrum::draw_spectrum() {
 
             // "add" a gap (which is 1/4 of the initial bar_width)
             // to both the left and right side of the bar
-            x1 = x1 + ( bar_width / 4 );
-            x2 = x2 - ( bar_width / 4 );
+            gap = ( bar_width / 4 );
+            x1 = x1 + gap;
+            x2 = x2 - gap;
 
             if ( this->spectrum_flip_horizontal ) {
                 x1 = -x1;

@@ -2,6 +2,9 @@
 
 #include <GL/gl.h>
 
+#include <asplib/SpectrumVisProcessor/asplib_SpectrumVisProcessor.hpp>
+using namespace asplib;
+
 class Spectrum {
 
     private:
@@ -15,6 +18,14 @@ class Spectrum {
                                     //   spectrum_colors[3*pos+1] = g;
                                     //   spectrum_colors[3*pos+2] = b;
 
+
+        float *vis_audio_data;
+        bool vis_audio_data_initialized = false;
+        bool vis_processor_initialized  = false;
+        bool vis_processor_init_failed  = false;
+        int frame_size                  = 0;
+        CSpectrumVisProcessor             vis_processor;
+        CSpectrumVisProcessorConfigurator vis_processor_configurator;
     public:
         /*!
          * @brief Create a new instance of the Spectrum
@@ -40,7 +51,7 @@ class Spectrum {
          * @details The position can go beyond -1.0f and 1.0f which would move the spectrum outside the visible boundaries
          */
         float spectrum_position_horizontal = 0.0f;
-        
+
         /*!
          * @brief Animation speed of the spectrum
          * @details the smaler the value, the slower but smoother the animation
