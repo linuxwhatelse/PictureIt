@@ -61,6 +61,10 @@ void Spectrum::audio_data(const float *audio_data, int audio_data_length) {
     if ( this->vis_processor_initialized && ! this->vis_processor_init_failed ) {
         std::copy_n( audio_data, this->frame_size, this->vis_audio_data );
 
+        for (int i = 0; i < this->frame_size/2; i++) {
+	        this->vis_audio_data[i] = (this->vis_audio_data[2*i] + this->vis_audio_data[2*i+1]) / 2.0f;
+        }
+
         this->vis_processor.Process( this->vis_audio_data, this->vis_audio_data );
 
         for ( int i = 0; i < spectrum_bar_count; i++ ) {
