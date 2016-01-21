@@ -1,6 +1,6 @@
 PictureIt Visualization
 =======================
-[![Linux Build Status](https://travis-ci.org/linuxwhatelse/PictureIt.svg?branch=travis)](https://travis-ci.org/linuxwhatelse/PictureIt)
+[![Linux Build Status](https://travis-ci.org/linuxwhatelse/PictureIt.svg?branch=master)](https://travis-ci.org/linuxwhatelse/PictureIt)
 
 This project is in heavy development and should't be used in its current state  
 as core functionality changes quite often.  
