@@ -51,7 +51,7 @@ set(PI_HEADERS src/pictureit.h
 
 # Configure PictureItConfig.cmake.in
 set(PICTUREIT_LIBRARY_DIR "${CMAKE_INSTALL_PREFIX}/lib")
-set(PICTUREIT_INCLUDE_DIR "${CMAKE_INSTALL_PREFIX}/include")
+set(PICTUREIT_INCLUDE_DIR "${CMAKE_INSTALL_PREFIX}/include/PictureIt")
 list(APPEND PICTUREIT_INCLUDE_DIRS "${ASPLIB_INCLUDE_DIR}"
                                    "${ASPLIB_INCLUDE_DIRS}")
 list(APPEND PICTUREIT_LIBRARIES "${ASPLIB_LIBRARY}"
@@ -71,7 +71,12 @@ set_target_properties(PictureIt PROPERTIES
 
 install(TARGETS PictureIt DESTINATION ${PICTUREIT_LIBRARY_DIR} EXPORT PictureIt)
 
-install(DIRECTORY "${PROJECT_SOURCE_DIR}/src/" DESTINATION "${PICTUREIT_INCLUDE_DIR}/PictureIt" PATTERN "*.h")
+# Install all header files
+foreach ( HEADER ${PI_HEADERS} )
+    get_filename_component( DIR ${HEADER} DIRECTORY )
+    string(REGEX REPLACE "src" "" DIR ${DIR})
+    install( FILES ${HEADER} DESTINATION "${PICTUREIT_INCLUDE_DIR}/${DIR}" )
+endforeach()
 
 if(WIN32 AND NOT CYGWIN)
     set(DEF_INSTALL_CMAKE_DIR PictureIt)
