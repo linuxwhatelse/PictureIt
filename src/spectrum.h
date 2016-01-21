@@ -2,7 +2,7 @@
 
 #include <GL/gl.h>
 
-#include <SpectrumVisProcessor/asplib_SpectrumVisProcessor.hpp>
+#include <asplib/SpectrumVisProcessor/asplib_SpectrumVisProcessor.hpp>
 using namespace asplib;
 
 class Spectrum {
