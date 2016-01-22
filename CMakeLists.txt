@@ -5,7 +5,7 @@ set(GENERIC_LIB_VERSION "0.0.0")
 set(GENERIC_LIB_SOVERSION "0")
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
-include_directories(${CMAKE_INCLUDE_PATH})
+include_directories(${CMAKE_MODULE_PATH})
 
 # Enable pic
 if(NOT WIN32)
