@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <algorithm>
+#include <iostream>
+
 
 Spectrum::Spectrum(int spectrum_bar_count) {
     this->spectrum_bar_count = spectrum_bar_count;
@@ -38,7 +40,6 @@ Spectrum::~Spectrum() {
     delete[] this->spectrum_colors;
 }
 
-#include <iostream>
 void Spectrum::audio_data(const float *audio_data, int audio_data_length) {
     // When we get called the first time, we create a new array holding the same values
     // as :audio_data: as we need a non const version of it
