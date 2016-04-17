@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <math.h>
 #include <algorithm>
-#include <iostream>
 
 
 Spectrum::Spectrum(int spectrum_bar_count) {
@@ -26,7 +25,7 @@ Spectrum::Spectrum(int spectrum_bar_count) {
 }
 
 Spectrum::~Spectrum() {
-    if ( this->vis_processor_initialized && ! this->vis_processor_init_failed ) {
+    if ( this->vis_processor_initialized ) {
         this->vis_processor.Destroy();
     }
 
@@ -41,44 +40,51 @@ Spectrum::~Spectrum() {
 }
 
 void Spectrum::audio_data(const float *audio_data, int audio_data_length) {
-    // When we get called the first time, we create a new array holding the same values
-    // as :audio_data: as we need a non const version of it
-    if ( ! this->vis_audio_data_initialized ) {
-        this->frame_size = audio_data_length / sizeof(audio_data[0]);
+    // Half of audio_date as we want mono
+    int frame_size = audio_data_length / 2;
+    // FFT needs an even frame_size
+    frame_size -= frame_size % 2;
 
-        this->vis_audio_data = new float[this->frame_size]();
-        this->vis_audio_data_initialized = true;
-    }
+    // In case the frame_size changed, we have to re-initialize
+    // the vis_processor and our vis_audio_data array
+    if ( this->old_frame_size != frame_size) {
+        this->asplib_error = this->vis_processor.Create( this->vis_processor_configurator, frame_size );
 
-    // When we get called the first time, we create a vis_processor instance
-    if ( ! this->vis_processor_initialized && ! this->vis_processor_init_failed ) {
-        if ( this->vis_processor.Create( this->vis_processor_configurator, this->frame_size ) != ASPLIB_ERR_NO_ERROR ) {
-            this->vis_processor_init_failed = true;
+        if ( this->asplib_error != ASPLIB_ERR_NO_ERROR ) {
+            this->vis_processor_initialized = false;
+        } else {
+            if ( this->vis_audio_data_initialized ) {
+                delete[] this->vis_audio_data;
+            }
+            this->vis_audio_data = new float[frame_size]();
+
+            this->vis_audio_data_initialized = true;
+            this->vis_processor_initialized = true;
         }
-        this->vis_processor_initialized = true;
+
+        this->old_frame_size = frame_size;
     }
 
     // Processor was initialized successfully
-    if ( this->vis_processor_initialized && ! this->vis_processor_init_failed ) {
-        std::copy_n( audio_data, this->frame_size, this->vis_audio_data );
-
-        for (int i = 0; i < this->frame_size/2; i++) {
-	        this->vis_audio_data[i] = (this->vis_audio_data[2*i] + this->vis_audio_data[2*i+1]) / 2.0f;
+    if ( this->vis_processor_initialized ) {
+        // Combine left and right channel for the processor
+        for (int i = 0; i < frame_size; i++) {
+	        this->vis_audio_data[i] = ( audio_data[2*i] + audio_data[2*i+1] ) / 2.0f;
         }
 
         this->vis_processor.Process( this->vis_audio_data, this->vis_audio_data );
 
+        // The result is heavily "amplified" (way to high values) meaning
+        // we have to lower them equaly
         for ( int i = 0; i < spectrum_bar_count; i++ ) {
-            this->vis_audio_data[i] = (float)this->vis_audio_data[i] / 10.0f;
-            //if ( this->vis_audio_data[i] < 0.02f ) {
-            //    this->vis_audio_data[i] = 0.01f;
-            //}
-
-            this->bar_heights[i] = this->vis_audio_data[i];
+            // this->bar_heights is what will be used to draw the spectrum
+            this->bar_heights[i] = (float) this->vis_audio_data[i] / 30.0f;
         }
     } else {
         // Here we would need some form of fallback values to display as
-        // initializing the processor failed
+        // initializing the processor failed.
+        // Or we could make this method return a boolean telling the
+        // caller something went wrong
     }
 }
 
@@ -89,10 +95,11 @@ void Spectrum::draw_bar( int i, GLfloat pos_x1, GLfloat pos_x2 ) {
         // The "10.0" is a random value I choose after some testing.
         float gravity = ::fabs( this->cbar_heights[i] - this->pbar_heights[i] ) / 10.0;
 
-        if ( this->cbar_heights[i] < this->bar_heights[i] )
+        if ( this->cbar_heights[i] < this->bar_heights[i] ) {
             this->cbar_heights[i] += this->spectrum_animation_speed + gravity;
-        else
+        } else {
             this->cbar_heights[i] -= this->spectrum_animation_speed + gravity;
+        }
     }
     this->pbar_heights[i] = this->bar_heights[i];
 
@@ -100,14 +107,14 @@ void Spectrum::draw_bar( int i, GLfloat pos_x1, GLfloat pos_x2 ) {
         glColor3f( this->spectrum_colors[ 3*i ], this->spectrum_colors[ 3*i+1 ], this->spectrum_colors[ 3*i+2 ] );
 
         glBegin(GL_TRIANGLES);
-            glVertex2f( x1, y );                           // Top Left
-            glVertex2f( x2, y );                           // Top Right
+            glVertex2f( x1, y );                                 // Top Left
+            glVertex2f( x2, y );                                 // Top Right
             glVertex2f( x2, this->spectrum_position_vertical );  // Bottom Right
         glEnd();
         glBegin(GL_TRIANGLES);
             glVertex2f( x2, this->spectrum_position_vertical );  // Bottom Right
             glVertex2f( x1, this->spectrum_position_vertical );  // Bottom Left
-            glVertex2f( x1, y );                           // Top Left
+            glVertex2f( x1, y );                                 // Top Left
         glEnd();
 
         if ( this->spectrum_mirror_horizontal ) {
@@ -115,14 +122,14 @@ void Spectrum::draw_bar( int i, GLfloat pos_x1, GLfloat pos_x2 ) {
             x2 = x2 - ( this->spectrum_position_horizontal * 2 );
 
             glBegin(GL_TRIANGLES);
-                glVertex2f( -x2, y );                           // Top Left
-                glVertex2f( -x1, y );                           // Top Right
+                glVertex2f( -x2, y );                                 // Top Left
+                glVertex2f( -x1, y );                                 // Top Right
                 glVertex2f( -x1, this->spectrum_position_vertical );  // Bottom Right
             glEnd();
             glBegin(GL_TRIANGLES);
                 glVertex2f( -x1, this->spectrum_position_vertical );  // Bottom Right
                 glVertex2f( -x2, this->spectrum_position_vertical );  // Bottom Left
-                glVertex2f( -x2, y );                           // Top Left
+                glVertex2f( -x2, y );                                 // Top Left
             glEnd();
         }
     };
