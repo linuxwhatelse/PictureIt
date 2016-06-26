@@ -15,7 +15,8 @@ find_package(CXX11 REQUIRED)
 # Find and include OpenGL
 find_package(OpenGL REQUIRED)
 # Find and include asplib
-find_package(asplib REQUIRED SpectrumVisProcessor FFT)
+find_package(KissFFT 1.30 REQUIRED)
+find_package(asplib 1.0 REQUIRED)
 
 # add definitions and include directories
 add_definitions(${OpenGL_DEFINITIONS})
@@ -39,11 +40,11 @@ set(HEADERS src/pictureit.h
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${HEADERS})
 add_library(PI::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} INTERFACE
-                           PRIVATE src deps
+                           PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/deps
                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/deps>
                            $<INSTALL_INTERFACE:include>
-                           $<INSTALL_INTERFACE:include/${PROJECT_NAME}>)
+                           $<INSTALL_INTERFACE:include/PictureIt>)
 
 if(WIN32)
   target_include_directories(${PROJECT_NAME} INTERFACE

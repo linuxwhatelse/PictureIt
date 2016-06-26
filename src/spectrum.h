@@ -3,7 +3,7 @@
 #include <GL/gl.h>
 
 #include <asplib/SpectrumVisProcessor/asplib_SpectrumVisProcessor.hpp>
-using namespace asplib;
+#include <asplib/Core/Buffers/asplib_TRingBuffer.h>
 
 class Spectrum {
 
@@ -38,15 +38,16 @@ class Spectrum {
         GLfloat *spectrum_colors;
 
 
-        float *vis_audio_data;
+        float *vis_audio_data = nullptr;
 
         int old_frame_size              = 0;
         bool vis_audio_data_initialized = false;
         bool vis_processor_initialized  = false;
         ASPLIB_ERR asplib_error         = ASPLIB_ERR_NO_ERROR;
-        CSpectrumVisProcessor             vis_processor;
-        CSpectrumVisProcessorConfigurator vis_processor_configurator;
-
+        asplib::CSpectrumVisProcessor             vis_processor;
+        asplib::CSpectrumVisProcessorConfigurator vis_processor_configurator;
+        asplib::TRingBuffer<float>                audio_ring_buf;
+    
     public:
         /*!
          * @brief Create a new instance of the Spectrum
