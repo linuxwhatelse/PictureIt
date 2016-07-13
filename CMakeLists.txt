@@ -1,87 +1,127 @@
-cmake_minimum_required(VERSION 2.6)
-project(PictureIt CXX)
+cmake_minimum_required(VERSION 3.0)
 
-set(GENERIC_LIB_VERSION "0.0.0")
-set(GENERIC_LIB_SOVERSION "0")
 
-list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
-include_directories(${CMAKE_MODULE_PATH})
+project(PictureIt LANGUAGES CXX VERSION 0.0.1)
 
-# Enable pic
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
+
+include(cmake/UseMultiArch.cmake)
+
+
 if(NOT WIN32)
     set(CMAKE_POSITION_INDEPENDENT_CODE 1)
 endif()
 
-# Find and use C++11
+
+# We need C++11
 find_package(CXX11 REQUIRED)
+
 
 # Find and include OpenGL
 find_package(OpenGL REQUIRED)
 add_definitions(${OpenGL_DEFINITIONS})
 include_directories(${OpenGL_INCLUDE_DIRS})
 
-# Find and include asplib
-find_package(asplib REQUIRED)
-include_directories(${ASPLIB_INCLUDE_DIR} ${ASPLIB_INCLUDE_DIRS})
 
-# Define PictureIt includes
-list(APPEND PI_INCLUDES "${PROJECT_SOURCE_DIR}/src")
-list(APPEND PI_INCLUDES "${PROJECT_SOURCE_DIR}/deps")
 
+set(SOURCES src/pictureit.cpp
+            src/spectrum.cpp
+            src/utils.cpp
+            src/effects/effects.cpp
+            src/effects/crossfade.cpp
+            src/effects/slide.cpp)
+
+set(HEADERS src/pictureit.h
+            src/spectrum.h
+            src/utils.h
+            src/effects/effects.h
+            src/effects/crossfade.h
+            src/effects/slide.h)
+
+
+set(INCLUDES src deps)
 if(WIN32)
-    list(APPEND PI_INCLUDES "${PROJECT_SOURCE_DIR}/deps/win32")
+    set(INCLUDES ${INCLUDES} deps/win32)
 endif()
+include_directories(${INCLUDES})
 
-# Include PictureIt direcotires
-include_directories(${PI_INCLUDES})
+#include_directories("${PROJECT_SOURCE_DIR}/src")
+#include_directories("${PROJECT_SOURCE_DIR}/deps")
+#if(WIN32)
+#    include_directories("${PROJECT_SOURCE_DIR}/deps/win32")
+#endif()
 
-set(PI_SOURCES src/pictureit.cpp
-               src/spectrum.cpp
-               src/utils.cpp
-               src/effects/effects.cpp
-               src/effects/crossfade.cpp
-               src/effects/slide.cpp)
-
-set(PI_HEADERS src/pictureit.h
-               src/spectrum.h
-               src/utils.h
-               src/effects/effects.h
-               src/effects/crossfade.h
-               src/effects/slide.h)
-
-# Configure PictureItConfig.cmake.in
-set(PICTUREIT_LIBRARY_DIR "${CMAKE_INSTALL_PREFIX}/lib")
-set(PICTUREIT_INCLUDE_DIR "${CMAKE_INSTALL_PREFIX}/include/PictureIt")
-list(APPEND PICTUREIT_INCLUDE_DIRS "${ASPLIB_INCLUDE_DIR}"
-                                   "${ASPLIB_INCLUDE_DIRS}")
-list(APPEND PICTUREIT_LIBRARIES "${ASPLIB_LIBRARY}"
-                                "${ASPLIB_LIBRARIES}")
-configure_file(PictureItConfig.cmake.in "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/PictureItConfig.cmake" @ONLY)
+# Create PictureIt static library.
+add_library(${PROJECT_NAME} STATIC ${SOURCES} ${HEADERS})
 
 
-add_library(PictureIt STATIC ${PI_SOURCES} ${PI_HEADERS})
+# Define PictureIt namespace, which is very useful for exporting the PictureIt target.
+# ------------------------------------------------------------------------------------------------
+# The alias target can be used within the project and ensures with its :: name that 
+# target_link_libraries fails already at configure time when the target is not here. 
+# Without that, cmake would just assume that it's a system lib and just adds -llib to the 
+# linker flag, which would only show errors at link time.
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 
-set_target_properties(PictureIt PROPERTIES LINKER_LANGUAGE CXX)
-set_target_properties(PictureIt PROPERTIES OUTPUT_NAME PictureIt)
-set_target_properties(PictureIt PROPERTIES
-        COMPILE_DEFINITONS "PICTUREIT_EXPORT"
-        VERSION "${GENERIC_LIB_VERSION}"
-        SOVERSION "${GENERIC_LIB_SOVERSION}")
+# set PictureIt target include directories
+# ------------------------------------------------------------------------------------------------
+# PRIVATE, PUBLIC, INTERFACE is best explained here:
+# https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html
+# PRIVATE   = use it for compiling/linking this library
+# INTERFACE = propagate it to users of the library, but don't use it for this library
+# PUBLIC    = both
+#
+# Rule of thumb for target_include_directories(...) is:
+# - If you use the dependecy only in your cpp files or private headers --> PRIVATE
+# - If you use it in public headers -> INTERFACE
+# - If both: PUBLIC
+target_include_directories(${PROJECT_NAME}
+                           PRIVATE   ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/tools
+                           INTERFACE $<INSTALL_INTERFACE:include>
+                                     $<INSTALL_INTERFACE:include/PictureIt>)
 
-install(TARGETS PictureIt DESTINATION ${PICTUREIT_LIBRARY_DIR} EXPORT PictureIt)
 
-# Install all header files
-foreach ( HEADER ${PI_HEADERS} )
+# Install PictureIt header files.
+foreach ( HEADER ${HEADERS} )
     get_filename_component( DIR ${HEADER} DIRECTORY )
     string(REGEX REPLACE "src" "" DIR ${DIR})
-    install( FILES ${HEADER} DESTINATION "${PICTUREIT_INCLUDE_DIR}/${DIR}" )
+    install( FILES ${HEADER} DESTINATION "${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME}/${DIR}" )
 endforeach()
 
-if(WIN32 AND NOT CYGWIN)
-    set(DEF_INSTALL_CMAKE_DIR PictureIt)
-else()
-    set(DEF_INSTALL_CMAKE_DIR lib/PictureIt)
-endif()
-set(INSTALL_CMAKE_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH "Installation directory for CMake files")
-install(FILES "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/PictureItConfig.cmake" DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)
+
+# Export PictureIt target.
+install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+
+
+# Include configure helper module.
+include(CMakePackageConfigHelpers)
+
+
+# Set PictureIt configure files install path.
+set(CMAKE_INSTALL_CMAKECONFIGDIR
+    ${CMAKE_INSTALL_LIBDIR_NOARCH}/cmake/${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH})
+
+
+# Generate and install basic PictureIt version file, which can be used by find_package(...).
+write_basic_package_version_file(${PROJECT_NAME}ConfigVersion.cmake COMPATIBILITY SameMajorVersion)
+install(FILES ${CMAKE_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+        DESTINATION ${CMAKE_INSTALL_CMAKECONFIGDIR})
+
+
+# Generate and install PictureIt configure file that is used by find_package(...).
+# This file makes an find module obsolute, if your project
+# sets CMAKE_PREFIX_PATH to the install path of PictureIt.
+configure_package_config_file(cmake/${PROJECT_NAME}Config.cmake.in ${PROJECT_NAME}Config.cmake
+                              INSTALL_DESTINATION ${CMAKE_INSTALL_CMAKECONFIGDIR})
+install(FILES ${CMAKE_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+        DESTINATION ${CMAKE_INSTALL_CMAKECONFIGDIR})
+
+
+# Export all targets that are included in the namespace PictureIt.
+# Furthermore this will generate the necessary code for PictureIt 
+# import as a CMake target for free.
+install(EXPORT ${PROJECT_NAME} FILE ${PROJECT_NAME}-targets.cmake NAMESPACE ${CMAKE_PROJECT_NAME}::
+        DESTINATION ${CMAKE_INSTALL_CMAKECONFIGDIR})
