@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
 
-
 project(PictureIt LANGUAGES CXX VERSION 0.0.1)
 
 
@@ -15,7 +14,7 @@ if(NOT WIN32)
 endif()
 
 
-# We need C++11
+# Make sure we use C++11
 find_package(CXX11 REQUIRED)
 
 
@@ -23,9 +22,10 @@ find_package(CXX11 REQUIRED)
 find_package(OpenGL REQUIRED)
 add_definitions(${OpenGL_DEFINITIONS})
 include_directories(${OpenGL_INCLUDE_DIRS})
+list(APPEND DEPLIBS ${OPENGL_LIBRARIES})
 
 
-
+# Set PictureIt source and header files
 set(SOURCES src/pictureit.cpp
             src/spectrum.cpp
             src/utils.cpp
@@ -40,18 +40,6 @@ set(HEADERS src/pictureit.h
             src/effects/crossfade.h
             src/effects/slide.h)
 
-
-set(INCLUDES src deps)
-if(WIN32)
-    set(INCLUDES ${INCLUDES} deps/win32)
-endif()
-include_directories(${INCLUDES})
-
-#include_directories("${PROJECT_SOURCE_DIR}/src")
-#include_directories("${PROJECT_SOURCE_DIR}/deps")
-#if(WIN32)
-#    include_directories("${PROJECT_SOURCE_DIR}/deps/win32")
-#endif()
 
 # Create PictureIt static library.
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${HEADERS})
@@ -78,8 +66,15 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 # - If you use the dependecy only in your cpp files or private headers --> PRIVATE
 # - If you use it in public headers -> INTERFACE
 # - If both: PUBLIC
+
+set(INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/src
+             ${CMAKE_CURRENT_SOURCE_DIR}/deps)
+if(WIN32)
+    list(APPEND INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/deps/win32)
+endif()
+
 target_include_directories(${PROJECT_NAME}
-                           PRIVATE   ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/tools
+                           PRIVATE   ${INCLUDES}
                            INTERFACE $<INSTALL_INTERFACE:include>
                                      $<INSTALL_INTERFACE:include/PictureIt>)
 
@@ -88,12 +83,16 @@ target_include_directories(${PROJECT_NAME}
 foreach ( HEADER ${HEADERS} )
     get_filename_component( DIR ${HEADER} DIRECTORY )
     string(REGEX REPLACE "src" "" DIR ${DIR})
-    install( FILES ${HEADER} DESTINATION "${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME}/${DIR}" )
+    install(FILES ${HEADER} DESTINATION "${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME}/${DIR}" )
 endforeach()
 
 
 # Export PictureIt target.
 install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+
+
+# Link all required libraries like OpenGL etc.
+target_link_libraries(${PROJECT_NAME} ${DEPLIBS})
 
 
 # Include configure helper module.
@@ -106,16 +105,19 @@ set(CMAKE_INSTALL_CMAKECONFIGDIR
 
 
 # Generate and install basic PictureIt version file, which can be used by find_package(...).
-write_basic_package_version_file(${PROJECT_NAME}ConfigVersion.cmake COMPATIBILITY SameMajorVersion)
-install(FILES ${CMAKE_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+                                 COMPATIBILITY SameMajorVersion)
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
         DESTINATION ${CMAKE_INSTALL_CMAKECONFIGDIR})
 
 
 # Generate and install PictureIt configure file that is used by find_package(...).
 # This file makes an find module obsolute, if your project
 # sets CMAKE_PREFIX_PATH to the install path of PictureIt.
-configure_package_config_file(cmake/${PROJECT_NAME}Config.cmake.in ${PROJECT_NAME}Config.cmake
+configure_package_config_file(cmake/${PROJECT_NAME}Config.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
                               INSTALL_DESTINATION ${CMAKE_INSTALL_CMAKECONFIGDIR})
+
 install(FILES ${CMAKE_BINARY_DIR}/${PROJECT_NAME}Config.cmake
         DESTINATION ${CMAKE_INSTALL_CMAKECONFIGDIR})
 
