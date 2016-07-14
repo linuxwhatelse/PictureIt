@@ -33,12 +33,12 @@ set(SOURCES src/pictureit.cpp
             src/effects/crossfade.cpp
             src/effects/slide.cpp)
 
-set(HEADERS include/PictureIt/pictureit.h
-            include/PictureIt/spectrum.h
-            include/PictureIt/utils.h
-            include/PictureIt/effects/effects.h
-            include/PictureIt/effects/crossfade.h
-            include/PictureIt/effects/slide.h)
+set(HEADERS include/PictureIt/pictureit.hpp
+            include/PictureIt/spectrum.hpp
+            include/PictureIt/utils.hpp
+            include/PictureIt/effects/effects.hpp
+            include/PictureIt/effects/crossfade.hpp
+            include/PictureIt/effects/slide.hpp)
 
 
 # Create PictureIt static library.

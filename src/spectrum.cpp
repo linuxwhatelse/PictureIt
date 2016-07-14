@@ -1,4 +1,4 @@
-#include "spectrum.h"
+#include "spectrum.hpp"
 
 #include <stdio.h>
 #include <math.h>

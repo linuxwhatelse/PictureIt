@@ -1,5 +1,5 @@
-#include "pictureit.h"
-#include "utils.h"
+#include "pictureit.hpp"
+#include "utils.hpp"
 
 #include <algorithm>
 #include <GL/gl.h>
