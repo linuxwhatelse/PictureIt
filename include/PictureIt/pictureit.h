@@ -16,12 +16,12 @@ class PictureIt : public Spectrum {
            0: The current displayed image.
            1: The next image which fades in.
         */
-        GLuint img_texture_ids[2]  =  {};
-        bool   img_update          =  true;
-        int    img_current_index   =  -1;
-        time_t img_last_updated    =  time(0);
-        bool   img_effect_finished =  true;
-        EFX    img_transition_efx  =  EFX::CROSSFADE;
+        GLuint  img_texture_ids[2]  =  {};
+        bool    img_update          =  true;
+        int     img_current_index   =  -1;
+        time_t  img_last_updated    =  time(0);
+        bool    img_effect_finished =  true;
+        EFX     img_transition_efx  =  EFX::CROSSFADE;
 
         int image_width            =  0;
         int image_height           =  0;
@@ -79,6 +79,7 @@ class PictureIt : public Spectrum {
          */
         PictureIt(int spectrum_bar_count = 64): Spectrum(spectrum_bar_count) {
             set_img_transition_efx(this->img_transition_efx);
+
             glGenTextures(2, this->img_texture_ids);
         };
 

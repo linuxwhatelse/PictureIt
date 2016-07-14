@@ -1,4 +1,4 @@
-#include "slide.h"
+#include "effects/slide.h"
 #include "utils.h"
 
 #include <cstring>

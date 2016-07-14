@@ -33,12 +33,12 @@ set(SOURCES src/pictureit.cpp
             src/effects/crossfade.cpp
             src/effects/slide.cpp)
 
-set(HEADERS src/pictureit.h
-            src/spectrum.h
-            src/utils.h
-            src/effects/effects.h
-            src/effects/crossfade.h
-            src/effects/slide.h)
+set(HEADERS include/PictureIt/pictureit.h
+            include/PictureIt/spectrum.h
+            include/PictureIt/utils.h
+            include/PictureIt/effects/effects.h
+            include/PictureIt/effects/crossfade.h
+            include/PictureIt/effects/slide.h)
 
 
 # Create PictureIt static library.
@@ -67,7 +67,7 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 # - If you use it in public headers -> INTERFACE
 # - If both: PUBLIC
 
-set(INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/src
+set(INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include/PictureIt
              ${CMAKE_CURRENT_SOURCE_DIR}/deps)
 if(WIN32)
     list(APPEND INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/deps/win32)
@@ -80,12 +80,7 @@ target_include_directories(${PROJECT_NAME}
 
 
 # Install PictureIt header files.
-foreach ( HEADER ${HEADERS} )
-    get_filename_component( DIR ${HEADER} DIRECTORY )
-    string(REGEX REPLACE "src" "" DIR ${DIR})
-    install(FILES ${HEADER} DESTINATION "${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME}/${DIR}" )
-endforeach()
-
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include DESTINATION ${CMAKE_INSTALL_PREFIX})
 
 # Export PictureIt target.
 install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)

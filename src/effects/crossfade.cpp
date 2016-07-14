@@ -1,4 +1,4 @@
-#include "crossfade.h"
+#include "effects/crossfade.h"
 #include "utils.h"
 
 #include <cstring>

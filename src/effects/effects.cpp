@@ -1,4 +1,4 @@
-#include "effects.h"
+#include "effects/effects.h"
 
 #include <sys/time.h>
 #include <GL/gl.h>
