@@ -6,23 +6,22 @@ project(PictureIt LANGUAGES CXX VERSION 0.0.1)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 
-include(cmake/UseMultiArch.cmake)
+include(GNUInstallDirs)
 
 
-if(NOT WIN32)
-    set(CMAKE_POSITION_INDEPENDENT_CODE 1)
-endif()
+set(CMAKE_POSITION_INDEPENDENT_CODE 1)
 
 
 # Make sure we use C++11
-find_package(CXX11 REQUIRED)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 
-# Find and include OpenGL
-find_package(OpenGL REQUIRED)
-add_definitions(${OpenGL_DEFINITIONS})
-include_directories(${OpenGL_INCLUDE_DIRS})
-list(APPEND DEPLIBS ${OPENGL_LIBRARIES})
+# Include OpenGL
+include(FindOpenGL)
+include_directories(${OPENGL_INCLUDE_DIR})
+list(APPEND DEPLIBS ${OPENGL_gl_LIBRARY})
 
 
 # Set PictureIt source and header files
@@ -87,7 +86,7 @@ install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME} DESTINATION ${CMAKE_INSTA
 
 
 # Link all required libraries like OpenGL etc.
-target_link_libraries(${PROJECT_NAME} ${DEPLIBS})
+target_link_libraries(${PROJECT_NAME} PUBLIC ${DEPLIBS})
 
 
 # Include configure helper module.
@@ -96,7 +95,7 @@ include(CMakePackageConfigHelpers)
 
 # Set PictureIt configure files install path.
 set(CMAKE_INSTALL_CMAKECONFIGDIR
-    ${CMAKE_INSTALL_LIBDIR_NOARCH}/cmake/${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH})
+    ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH})
 
 
 # Generate and install basic PictureIt version file, which can be used by find_package(...).
