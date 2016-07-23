@@ -11,7 +11,6 @@ execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
 execute_process(COMMAND ${CMAKE_COMMAND} --build .
                 WORKING_DIRECTORY ${ASPLIB_BUILD_DIR})
 
-
 add_subdirectory(${ASPLIB_SRC_DIR}
                  ${ASPLIB_BUILD_DIR})
 
