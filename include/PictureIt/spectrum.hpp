@@ -2,11 +2,9 @@
 
 #include <GL/gl.h>
 
-//namespace asplib {
-//    class CSpectrumVisProcessor;
-//    class CSpectrumVisProcessorConfigurator;
-//}
-//using namespace asplib;
+#include <asplib/SpectrumVisProcessor/asplib_SpectrumVisProcessor.hpp>
+#include <asplib/Core/Buffers/asplib_TRingBuffer.h>
+
 
 class Spectrum {
 
@@ -24,12 +22,14 @@ class Spectrum {
 
         float *vis_audio_data;
         bool vis_audio_data_initialized = false;
-        bool vis_processor_initialized  = false;
-        bool vis_processor_init_failed  = false;
         int frame_size                  = 0;
 
-        //CSpectrumVisProcessor             &vis_processor;
-        //CSpectrumVisProcessorConfigurator &vis_processor_configurator;
+
+        bool vis_processor_initialized  = false;
+
+        asplib::TRingBuffer<float>                audio_ring_buf;
+        asplib::CSpectrumVisProcessor             vis_processor;
+        asplib::CSpectrumVisProcessorConfigurator vis_processor_configurator;
 
     public:
         /*!

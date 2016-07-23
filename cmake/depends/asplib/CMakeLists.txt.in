@@ -1,0 +1,24 @@
+cmake_minimum_required(VERSION 2.8.2)
+ 
+project(asplib-download NONE)
+ 
+include(ExternalProject)
+
+ExternalProject_Add(
+    asplib
+
+    # Use -DASPLIB_LOCAL_SRC_DIR=<path>
+    URL                "${ASPLIB_LOCAL_SRC_DIR}"
+
+    # Otherwise download from github
+    GIT_REPOSITORY    "https://github.com/AchimTuran/asplib"
+    GIT_TAG           "add-spectrum-vis-processor"
+
+    SOURCE_DIR        "${ASPLIB_SRC_DIR}"
+    BINARY_DIR        "${ASPLIB_BUILD_DIR}"
+
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND     ""
+    INSTALL_COMMAND   ""
+    TEST_COMMAND      ""
+)

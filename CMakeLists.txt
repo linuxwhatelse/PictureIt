@@ -24,6 +24,11 @@ include_directories(${OPENGL_INCLUDE_DIR})
 list(APPEND DEPLIBS ${OPENGL_gl_LIBRARY})
 
 
+# Include asplib
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/depends/asplib/add_asplib.cmake)
+list(APPEND DEPLIBS asplib::Core asplib::SpectrumVisProcessor)
+
+
 # Set PictureIt source and header files
 set(SOURCES src/pictureit.cpp
             src/spectrum.cpp
