@@ -1,6 +1,6 @@
 #include "utils.hpp"
 
-#include <fnmatch.h>
+//#include <fnmatch.h> //TODO: how to use fnmatch.h under Windows?
 #if defined(TARGET_WINDOWS)
   #include <Windows.h>
   #define GL_CLAMP_TO_EDGE 0x812F
@@ -60,10 +60,11 @@ namespace PI_UTILS {
             } else if ( entry->d_type != DT_DIR && name && name[0] != '.' ) {
                 if ( file_filter ) {
                     for ( unsigned int i = 0; i < filter_size / sizeof( file_filter[0] ); i++) {
-                        if ( fnmatch( file_filter[i], name, FNM_CASEFOLD ) == 0) {
-                            add = true;
-                            break;
-                        }
+						//TODO: how to use fnmatch.h under Windows?
+                        //if ( fnmatch( file_filter[i], name, FNM_CASEFOLD ) == 0) {
+                        //    add = true;
+                        //    break;
+                        //}
                     }
                 }
             }
