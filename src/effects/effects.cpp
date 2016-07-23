@@ -1,6 +1,6 @@
 #include "effects/effects.hpp"
 
-#include <sys/time.h>
+//#include <sys/time.h> //TODO: user sys/time.h under Windows
 #if defined(TARGET_WINDOWS)
   #include <Windows.h>
 #endif
@@ -33,7 +33,7 @@ EFXBase::~EFXBase() {
 
 long int EFXBase::get_current_time_ms() {
     struct timeval current_time;
-    gettimeofday( &current_time, NULL );
+    //gettimeofday( &current_time, NULL ); //TODO: user sys/time.h under Windows
 
     return current_time.tv_sec * 1000 + current_time.tv_usec / 1000;
 }

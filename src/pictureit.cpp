@@ -99,11 +99,12 @@ bool PictureIt::render() {
     start_render();
 
     if ( ! this->images.empty() ) {
-        if ( this->img_update_by_interval && this->img_effect_finished && time(0) >= ( this->img_last_updated + this->img_update_interval ))
-            img_update = true;
+		// TODO: implement time(..) under Windows
+        //if ( this->img_update_by_interval && this->img_effect_finished && time(0) >= ( this->img_last_updated + this->img_update_interval ))
+        //    img_update = true;
 
         if ( this->img_update == true ) {
-            this->img_last_updated    = time(0);
+            //this->img_last_updated    = time(0); // TODO: implement time(..) under Windows
             this->img_effect_finished = false;
             this->img_update          = false;
 
