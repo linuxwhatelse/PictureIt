@@ -1,6 +1,9 @@
 #include "effects/effects.hpp"
 
 #include <sys/time.h>
+#if defined(TARGET_WINDOWS)
+  #include <Windows.h>
+#endif
 #include <GL/gl.h>
 
 #include <algorithm>

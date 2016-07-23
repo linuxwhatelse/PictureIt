@@ -1,5 +1,8 @@
 #pragma once
 
+#if defined(TARGET_WINDOWS)
+  #include <Windows.h>
+#endif
 #include <GL/gl.h>
 
 #include <asplib/SpectrumVisProcessor/asplib_SpectrumVisProcessor.hpp>

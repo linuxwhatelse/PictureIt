@@ -2,6 +2,9 @@
 #include "utils.hpp"
 
 #include <algorithm>
+#if defined(TARGET_WINDOWS)
+  #include <Windows.h>
+#endif
 #include <GL/gl.h>
 
 PictureIt::~PictureIt() {

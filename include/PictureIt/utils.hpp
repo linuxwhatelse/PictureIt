@@ -3,6 +3,9 @@
 #include <string>
 #include <vector>
 
+#if defined(TARGET_WINDOWS)
+  #include <Windows.h>
+#endif
 #include <GL/gl.h>
 
 using namespace std;

@@ -1,6 +1,11 @@
 #include "utils.hpp"
 
 #include <fnmatch.h>
+#if defined(TARGET_WINDOWS)
+  #include <Windows.h>
+  #define GL_CLAMP_TO_EDGE 0x812F
+#endif
+
 #include <GL/gl.h>
 
 #include <dirent.h>
