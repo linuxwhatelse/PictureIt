@@ -7,6 +7,9 @@ include(ExternalProject)
 ExternalProject_Add(
     asplib
 
+    CMAKE_ARGS        "-DASPLIB_MODULES_TO_BUILD=custom"
+                      "-DBUILD_SPECTRUMVISPROCESSOR=ON"
+
     # Use -DASPLIB_LOCAL_SRC_DIR=<path>
     URL                "${ASPLIB_LOCAL_SRC_DIR}"
 
