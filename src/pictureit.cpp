@@ -7,6 +7,8 @@
 #endif
 #include <GL/gl.h>
 
+const char *PictureIt::image_filter[3] = { "*.jpg", "*.png", "*.jpeg" };
+
 PictureIt::~PictureIt() {
     delete this->efx;
 
