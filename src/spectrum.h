@@ -3,29 +3,51 @@
 #include <GL/gl.h>
 
 #include <asplib/SpectrumVisProcessor/asplib_SpectrumVisProcessor.hpp>
-using namespace asplib;
+#include <asplib/Core/Buffers/asplib_TRingBuffer.h>
 
 class Spectrum {
 
     private:
-        int     spectrum_bar_count; // Amount of single bars to display
-        GLfloat *bar_heights;       // FFT'ed heights for each bar
-        GLfloat *pbar_heights;      // Previous FFT'ed value. (used to calculate gravity.
-                                    // The bigger the difference to :bar_heights:, the faster the bars will move)
-        GLfloat *cbar_heights;      // Used to smoothen the animation on a "per frame" basis
-        GLfloat *spectrum_colors;   // Will be the size of :spectrum_bar_count: * 3
-                                    //   spectrum_colors[3*pos]   = r;
-                                    //   spectrum_colors[3*pos+1] = g;
-                                    //   spectrum_colors[3*pos+2] = b;
+        /*!
+         * @brief Amount of single bars to display
+         */
+        int spectrum_bar_count;
+
+        /*!
+         * @brief FFT'ed heights for each bar
+         */
+        GLfloat *bar_heights;
+
+        /*!
+         * @brief Previous FFT'ed values (used to calculate gravity)
+         * The bigger the difference to :bar_heights:, the faster the bars will move
+         */
+        GLfloat *pbar_heights;
+
+        /*!
+         * @brief Used to smoothen the animation on a "per frame" basis
+         */
+        GLfloat *cbar_heights;
+
+        /*!
+         * @brief Will be the size of :spectrum_bar_count: * 3
+         *   spectrum_colors[3*pos]   = r;
+         *   spectrum_colors[3*pos+1] = g;
+         *   spectrum_colors[3*pos+2] = b;
+         */
+        GLfloat *spectrum_colors;
 
 
-        float *vis_audio_data;
+        float *vis_audio_data = nullptr;
+
+        int old_frame_size              = 0;
         bool vis_audio_data_initialized = false;
         bool vis_processor_initialized  = false;
-        bool vis_processor_init_failed  = false;
-        int frame_size                  = 0;
-        CSpectrumVisProcessor             vis_processor;
-        CSpectrumVisProcessorConfigurator vis_processor_configurator;
+        ASPLIB_ERR asplib_error         = ASPLIB_ERR_NO_ERROR;
+        asplib::CSpectrumVisProcessor             vis_processor;
+        asplib::CSpectrumVisProcessorConfigurator vis_processor_configurator;
+        asplib::TRingBuffer<float>                audio_ring_buf;
+    
     public:
         /*!
          * @brief Create a new instance of the Spectrum
