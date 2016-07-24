@@ -1,5 +1,5 @@
-set(ASPLIB_SRC_DIR ${CMAKE_BINARY_DIR}/3rdParty/asplib-src)
-set(ASPLIB_BUILD_DIR ${CMAKE_BINARY_DIR}/3rdParty/asplib-build)
+set(ASPLIB_SRC_DIR ${CMAKE_BINARY_DIR}/depends/asplib)
+set(ASPLIB_BUILD_DIR ${CMAKE_BINARY_DIR}/depends/0build/asplib)
 
 # Download and unpack asplib at configure time
 configure_file(${CMAKE_CURRENT_LIST_DIR}/CMakeLists.txt.in

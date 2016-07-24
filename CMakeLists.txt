@@ -26,7 +26,7 @@ list(APPEND DEPLIBS ${OPENGL_gl_LIBRARY})
 
 # Include asplib
 set(ASPLIB_MODULES_TO_BUILD SpectrumVisProcessor)
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/depends/asplib/add_asplib.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/depends/common/asplib/add_asplib.cmake)
 list(APPEND DEPLIBS asplib::Core asplib::SpectrumVisProcessor)
 
 
