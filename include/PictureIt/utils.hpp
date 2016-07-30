@@ -17,6 +17,14 @@ namespace PI_UTILS {
     string path_join(string a, string b);
 
     /*!
+     * @brief Check whether a given value ends with a given suffix
+     * @param value The value to check against
+     * @param the suffix to be found at the end of the given value
+     * @return true if found, false otherwise
+     */
+    bool ends_with(string value, string suffix);
+
+    /*!
      * @brief List a directories content
      * @param path the path whichs content should be listed
      * @param store a data-store where found content should be written to
@@ -35,4 +43,10 @@ namespace PI_UTILS {
      * @return true if successful, false otherwise
      */
     bool load_image(const char *img_path, GLuint texture_id, int &width, int &height);
+
+    /*!
+     * @brief Get current time in milliseconds
+     * @return Current time in milliseconds
+     */
+    long get_time_in_ms();
 }

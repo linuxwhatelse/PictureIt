@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <GL/gl.h>
 
+const char *PictureIt::image_filter[3] = { ".jpg", ".png", ".jpeg" };
+
 PictureIt::~PictureIt() {
     delete this->efx;
 
@@ -96,11 +98,12 @@ bool PictureIt::render() {
     start_render();
 
     if ( ! this->images.empty() ) {
-        if ( this->img_update_by_interval && this->img_effect_finished && time(0) >= ( this->img_last_updated + this->img_update_interval ))
+        if ( this->img_update_by_interval && this->img_effect_finished &&
+            PI_UTILS::get_time_in_ms() >= ( this->img_last_updated + (this->img_update_interval * 1000) ))
             img_update = true;
 
         if ( this->img_update == true ) {
-            this->img_last_updated    = time(0);
+            this->img_last_updated    = PI_UTILS::get_time_in_ms();
             this->img_effect_finished = false;
             this->img_update          = false;
 
