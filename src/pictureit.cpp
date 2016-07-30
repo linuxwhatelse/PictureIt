@@ -8,7 +8,7 @@
 
 #include <algorithm>
 
-const char *PictureIt::image_filter[3] = { ".jpg", ".png", ".jpeg" };
+const char *PictureIt::image_filter[] = { ".jpg", ".png", ".jpeg", ".JPG", ".PNG", ".JPEG" };
 
 PictureIt::~PictureIt() {
     delete this->efx;

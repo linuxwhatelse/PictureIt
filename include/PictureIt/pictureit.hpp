@@ -28,7 +28,7 @@ class PictureIt : public Spectrum {
 
         vector<string> images;
 
-		static const char *image_filter[3];
+		static const char *image_filter[];
 
         void start_render();
         void finish_render();
