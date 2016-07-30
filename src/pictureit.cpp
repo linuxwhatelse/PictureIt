@@ -1,11 +1,12 @@
+#if defined(TARGET_WINDOWS)
+    #include <Windows.h>
+#endif
+#include <GL/gl.h>
+
 #include "pictureit.hpp"
 #include "utils.hpp"
 
 #include <algorithm>
-#if defined(TARGET_WINDOWS)
-  #include <Windows.h>
-#endif
-#include <GL/gl.h>
 
 const char *PictureIt::image_filter[3] = { ".jpg", ".png", ".jpeg" };
 

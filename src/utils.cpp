@@ -1,6 +1,3 @@
-#include "utils.hpp"
-
-
 #if defined(TARGET_WINDOWS)
     #include <Windows.h>
     #define GL_CLAMP_TO_EDGE 0x812F
@@ -10,6 +7,7 @@
 
 #include <GL/gl.h>
 
+#include "utils.hpp"
 #include <dirent.h>
 
 #define STB_IMAGE_IMPLEMENTATION
