@@ -31,14 +31,6 @@ EFXBase::~EFXBase() {
     delete[] this->tex_br;
 }
 
-long int EFXBase::get_current_time_ms() {
-    struct timeval current_time;
-    //gettimeofday( &current_time, NULL ); //TODO: user sys/time.h under Windows
-
-    return current_time.tv_sec * 1000 + current_time.tv_usec / 1000;
-}
-
-
 void EFXBase::draw_image(GLuint texture_id, bool is_new_image, GLfloat top_left[], GLfloat top_right[], GLfloat bottom_left[], GLfloat bottom_right[], float opacity) {
     if ( ! texture_id )
         return;

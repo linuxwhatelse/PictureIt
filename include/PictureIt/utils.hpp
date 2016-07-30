@@ -3,9 +3,6 @@
 #include <string>
 #include <vector>
 
-#if defined(TARGET_WINDOWS)
-  #include <Windows.h>
-#endif
 #include <GL/gl.h>
 
 using namespace std;
@@ -18,6 +15,14 @@ namespace PI_UTILS {
      * @return path combined from :a: and :b:
      */
     string path_join(string a, string b);
+
+    /*!
+     * @brief Check whether a given value ends with a given suffix
+     * @param value The value to check against
+     * @param the suffix to be found at the end of the given value
+     * @return true if found, false otherwise
+     */
+    bool ends_with(string value, string suffix);
 
     /*!
      * @brief List a directories content
@@ -38,4 +43,10 @@ namespace PI_UTILS {
      * @return true if successful, false otherwise
      */
     bool load_image(const char *img_path, GLuint texture_id, int &width, int &height);
+
+    /*!
+     * @brief Get current time in milliseconds
+     * @return Current time in milliseconds
+     */
+    long get_time_in_ms();
 }

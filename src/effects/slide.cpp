@@ -41,12 +41,12 @@ bool EFXSlide::render(GLuint old_texture, GLuint new_texture) {
     if ( this->initial ) {
         this->initial = false;
         this->pos_current = 0.0f;
-        this->pos_offset_ms = (get_current_time_ms() % this->slide_time_ms);
+        this->pos_offset_ms = (PI_UTILS::get_time_in_ms() % this->slide_time_ms);
         this->random_direction = rand() % 4;
     }
 
     if ( this->pos_offset_ms && this->pos_current < 2.0f ) {
-        this->pos_current = (float) ( ( get_current_time_ms() - this->pos_offset_ms ) % this->slide_time_ms ) / this->slide_time_ms * 2;
+        this->pos_current = (float) ( ( PI_UTILS::get_time_in_ms() - this->pos_offset_ms ) % this->slide_time_ms ) / this->slide_time_ms * 2;
 
         if ( this->pos_current < this->pos_last ) {
             this->pos_last       = 0.0f;

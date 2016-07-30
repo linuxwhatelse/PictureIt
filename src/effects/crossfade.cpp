@@ -13,11 +13,11 @@ bool EFXCrossfade::render(GLuint old_texture, GLuint new_texture) {
     if ( this->initial ) {
         this->initial = false;
         this->fade_current = 0.0f;
-        this->fade_offset_ms = get_current_time_ms() % this->fade_time_ms;
+        this->fade_offset_ms = PI_UTILS::get_time_in_ms() % this->fade_time_ms;
     }
 
     if ( this->fade_offset_ms && this->fade_current < 1.0f ) {
-        this->fade_current = (float) ( ( get_current_time_ms() - this->fade_offset_ms ) % this->fade_time_ms ) / this->fade_time_ms;
+        this->fade_current = (float) ( ( PI_UTILS::get_time_in_ms() - this->fade_offset_ms ) % this->fade_time_ms ) / this->fade_time_ms;
 
         if ( this->fade_current < this->fade_last ) {
             this->fade_last       = 0.0f;

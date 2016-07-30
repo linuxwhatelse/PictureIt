@@ -40,7 +40,7 @@ class EFXBase {
         /*!
          * @brief The mode that should be used to scale the image
          */
-        MODE image_mode   = MODE::ZOOM;
+        MODE image_mode = MODE::ZOOM;
 
         /*!
          * @brief Width in pixel of the window rendering this visualization
@@ -88,12 +88,6 @@ class EFXBase {
          * @param new_texture Texture-ID representing the new image which is supposed to be "shown next"
          */
         virtual bool render(GLuint old_texture, GLuint new_texture) = 0;
-
-        /*!
-         * @brief Returns the current time in milliseconds
-         * @return current time in milliseconds
-         */
-        long int get_current_time_ms();
 
         /*!
          * @brief Draw an OpenGL texture to the screen

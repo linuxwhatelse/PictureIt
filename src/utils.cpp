@@ -1,9 +1,11 @@
 #include "utils.hpp"
 
-//#include <fnmatch.h> //TODO: how to use fnmatch.h under Windows?
+
 #if defined(TARGET_WINDOWS)
-  #include <Windows.h>
-  #define GL_CLAMP_TO_EDGE 0x812F
+    #include <Windows.h>
+    #define GL_CLAMP_TO_EDGE 0x812F
+#else
+    #include <sys/time.h>
 #endif
 
 #include <GL/gl.h>
@@ -35,7 +37,12 @@ namespace PI_UTILS {
 
         return a + "/" + b;
     }
-    
+
+    bool ends_with(string value, string suffix) {
+        return (value.size() >= suffix.size() &&
+            value.rfind(suffix) == (value.size() - suffix.size()));
+    }
+
     bool list_dir(const char *path, vector<string> &store, bool recursive, bool incl_full_path, const char *file_filter[], int filter_size) {
         string p = path;
         struct dirent *entry;
@@ -60,11 +67,10 @@ namespace PI_UTILS {
             } else if ( entry->d_type != DT_DIR && name && name[0] != '.' ) {
                 if ( file_filter ) {
                     for ( unsigned int i = 0; i < filter_size / sizeof( file_filter[0] ); i++) {
-						//TODO: how to use fnmatch.h under Windows?
-                        //if ( fnmatch( file_filter[i], name, FNM_CASEFOLD ) == 0) {
-                        //    add = true;
-                        //    break;
-                        //}
+                        if (PI_UTILS::ends_with(string(name), string(file_filter[i]))) {
+                            add = true;
+                            break;
+                        }
                     }
                 }
             }
@@ -113,5 +119,17 @@ namespace PI_UTILS {
         stbi_image_free(data);
 
         return true;
+    }
+
+    long get_time_in_ms() {
+        #if defined(TARGET_WINDOWS)
+            SYSTEMTIME time;
+            GetSystemTime(&time);
+            return (time.wSecond * 1000) + time.wMilliseconds;
+        #else
+            timeval time;
+            gettimeofday(&time, NULL);
+            return (time.tv_sec * 1000) + (time.tv_usec / 1000);
+        #endif
     }
 }

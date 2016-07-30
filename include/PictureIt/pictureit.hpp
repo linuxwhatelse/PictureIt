@@ -1,11 +1,11 @@
 #pragma once
 
+#include "utils.hpp"
 #include "spectrum.hpp"
 #include "effects/effects.hpp"
 
 #include <string>
 #include <vector>
-//#include <sys/time.h> //TODO: how to use sys/time.h under windows?
 
 using namespace std;
 
@@ -19,7 +19,7 @@ class PictureIt : public Spectrum {
         GLuint  img_texture_ids[2]  =  {};
         bool    img_update          =  true;
         int     img_current_index   =  -1;
-        //time_t  img_last_updated    =  time(0); //TODO: how to use time.h under windows?
+        long    img_last_updated    =  PI_UTILS::get_time_in_ms();
         bool    img_effect_finished =  true;
         EFX     img_transition_efx  =  EFX::CROSSFADE;
 
