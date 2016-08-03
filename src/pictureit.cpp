@@ -1,8 +1,3 @@
-#if defined(TARGET_WINDOWS)
-    #include <Windows.h>
-#endif
-#include <GL/gl.h>
-
 #include "pictureit.hpp"
 #include "utils.hpp"
 

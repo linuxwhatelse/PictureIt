@@ -1,5 +1,10 @@
 #pragma once
 
+#if defined(TARGET_WINDOWS)
+    #include <Windows.h>
+#endif
+#include <GL/gl.h>
+
 #include "utils.hpp"
 #include "spectrum.hpp"
 #include "effects/effects.hpp"
