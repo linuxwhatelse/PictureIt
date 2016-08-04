@@ -1,5 +1,5 @@
-#include "crossfade.h"
-#include "utils.h"
+#include "effects/crossfade.hpp"
+#include "utils.hpp"
 
 #include <cstring>
 

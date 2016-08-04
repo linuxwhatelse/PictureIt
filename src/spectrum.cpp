@@ -1,8 +1,11 @@
-#include "spectrum.h"
+#include "spectrum.hpp"
 
 #include <stdio.h>
 #include <math.h>
 #include <algorithm>
+
+//#include <asplib/SpectrumVisProcessor/asplib_SpectrumVisProcessor.hpp>
+//using namespace asplib;
 
 Spectrum::Spectrum(int spectrum_bar_count) {
     this->spectrum_bar_count = spectrum_bar_count;
@@ -21,11 +24,14 @@ Spectrum::Spectrum(int spectrum_bar_count) {
         this->spectrum_colors[ 3*i+1 ] = 1.0f;
         this->spectrum_colors[ 3*i+2 ] = 1.0f;
     }
+
+    //this->vis_processor              = CSpectrumVisProcessor();
+    //this->vis_processor_configurator = CSpectrumVisProcessorConfigurator();
 }
 
 Spectrum::~Spectrum() {
     if ( this->vis_processor_initialized && ! this->vis_processor_init_failed ) {
-        this->vis_processor.Destroy();
+        //this->vis_processor.Destroy();
     }
 
     if ( this->vis_audio_data_initialized ) {
@@ -38,47 +44,46 @@ Spectrum::~Spectrum() {
     delete[] this->spectrum_colors;
 }
 
-#include <iostream>
 void Spectrum::audio_data(const float *audio_data, int audio_data_length) {
-    // When we get called the first time, we create a new array holding the same values
-    // as :audio_data: as we need a non const version of it
-    if ( ! this->vis_audio_data_initialized ) {
-        this->frame_size = audio_data_length / sizeof(audio_data[0]);
-
-        this->vis_audio_data = new float[this->frame_size]();
-        this->vis_audio_data_initialized = true;
-    }
-
-    // When we get called the first time, we create a vis_processor instance
-    if ( ! this->vis_processor_initialized && ! this->vis_processor_init_failed ) {
-        if ( this->vis_processor.Create( this->vis_processor_configurator, this->frame_size ) != ASPLIB_ERR_NO_ERROR ) {
-            this->vis_processor_init_failed = true;
-        }
-        this->vis_processor_initialized = true;
-    }
-
-    // Processor was initialized successfully
-    if ( this->vis_processor_initialized && ! this->vis_processor_init_failed ) {
-        std::copy_n( audio_data, this->frame_size, this->vis_audio_data );
-
-        for (int i = 0; i < this->frame_size/2; i++) {
-	        this->vis_audio_data[i] = (this->vis_audio_data[2*i] + this->vis_audio_data[2*i+1]) / 2.0f;
-        }
-
-        this->vis_processor.Process( this->vis_audio_data, this->vis_audio_data );
-
-        for ( int i = 0; i < spectrum_bar_count; i++ ) {
-            this->vis_audio_data[i] = (float)this->vis_audio_data[i] / 10.0f;
-            //if ( this->vis_audio_data[i] < 0.02f ) {
-            //    this->vis_audio_data[i] = 0.01f;
-            //}
-
-            this->bar_heights[i] = this->vis_audio_data[i];
-        }
-    } else {
-        // Here we would need some form of fallback values to display as
-        // initializing the processor failed
-    }
+//    // When we get called the first time, we create a new array holding the same values
+//    // as :audio_data: as we need a non const version of it
+//    if ( ! this->vis_audio_data_initialized ) {
+//        this->frame_size = audio_data_length / sizeof(audio_data[0]);
+//
+//        this->vis_audio_data = new float[this->frame_size]();
+//        this->vis_audio_data_initialized = true;
+//    }
+//
+//    // When we get called the first time, we create a vis_processor instance
+//    if ( ! this->vis_processor_initialized && ! this->vis_processor_init_failed ) {
+//        if ( this->vis_processor.Create( this->vis_processor_configurator, this->frame_size ) != ASPLIB_ERR_NO_ERROR ) {
+//            this->vis_processor_init_failed = true;
+//        }
+//        this->vis_processor_initialized = true;
+//    }
+//
+//    // Processor was initialized successfully
+//    if ( this->vis_processor_initialized && ! this->vis_processor_init_failed ) {
+//        std::copy_n( audio_data, this->frame_size, this->vis_audio_data );
+//
+//        for (int i = 0; i < this->frame_size/2; i++) {
+//	        this->vis_audio_data[i] = (this->vis_audio_data[2*i] + this->vis_audio_data[2*i+1]) / 2.0f;
+//        }
+//
+//        this->vis_processor.Process( this->vis_audio_data, this->vis_audio_data );
+//
+//        for ( int i = 0; i < spectrum_bar_count; i++ ) {
+//            this->vis_audio_data[i] = (float)this->vis_audio_data[i] / 10.0f;
+//            //if ( this->vis_audio_data[i] < 0.02f ) {
+//            //    this->vis_audio_data[i] = 0.01f;
+//            //}
+//
+//            this->bar_heights[i] = this->vis_audio_data[i];
+//        }
+//    } else {
+//        // Here we would need some form of fallback values to display as
+//        // initializing the processor failed
+//    }
 }
 
 void Spectrum::draw_bar( int i, GLfloat pos_x1, GLfloat pos_x2 ) {

@@ -121,5 +121,5 @@ class EFXBase {
 };
 
 // Include all available effects here
-#include "crossfade.h"
-#include "slide.h"
+#include "crossfade.hpp"
+#include "slide.hpp"

@@ -2,8 +2,11 @@
 
 #include <GL/gl.h>
 
-#include <asplib/SpectrumVisProcessor/asplib_SpectrumVisProcessor.hpp>
-using namespace asplib;
+//namespace asplib {
+//    class CSpectrumVisProcessor;
+//    class CSpectrumVisProcessorConfigurator;
+//}
+//using namespace asplib;
 
 class Spectrum {
 
@@ -24,8 +27,10 @@ class Spectrum {
         bool vis_processor_initialized  = false;
         bool vis_processor_init_failed  = false;
         int frame_size                  = 0;
-        CSpectrumVisProcessor             vis_processor;
-        CSpectrumVisProcessorConfigurator vis_processor_configurator;
+
+        //CSpectrumVisProcessor             &vis_processor;
+        //CSpectrumVisProcessorConfigurator &vis_processor_configurator;
+
     public:
         /*!
          * @brief Create a new instance of the Spectrum

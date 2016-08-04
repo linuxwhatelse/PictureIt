@@ -1,5 +1,5 @@
-#include "slide.h"
-#include "utils.h"
+#include "effects/slide.hpp"
+#include "utils.hpp"
 
 #include <cstring>
 

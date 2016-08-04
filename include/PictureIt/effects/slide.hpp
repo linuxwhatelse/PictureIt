@@ -1,6 +1,6 @@
 #pragma once
 
-#include "effects.h"
+#include "effects.hpp"
 
 class EFXSlide: public EFXBase {
     private:
