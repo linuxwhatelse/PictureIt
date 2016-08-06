@@ -42,6 +42,11 @@ class Spectrum {
         Spectrum(int spectrum_bar_count);
         ~Spectrum();
 
+         /*!
+          * @brief Amount fft samples to calculate a spectrum
+          */
+        const unsigned int fft_frame_size;
+
         /*!
          * @brief Width of the spectrum ranging from 0.0f to 1.0f
          */

@@ -5,15 +5,16 @@
 #include <algorithm>
 
 
-#define RING_BUF_SIZE 4096
+#define RING_BUF_SIZE 4096*2
 
 
-Spectrum::Spectrum(int spectrum_bar_count) : audio_ring_buf(RING_BUF_SIZE) {
-    this->spectrum_bar_count = spectrum_bar_count;
-    
+Spectrum::Spectrum(int spectrum_bar_count) : 
+  audio_ring_buf(RING_BUF_SIZE), 
+  fft_frame_size(RING_BUF_SIZE/4) {
+    this->spectrum_bar_count = spectrum_bar_count;   
 
     ASPLIB_ERR asplib_error = this->vis_processor.Create(
-        this->vis_processor_configurator, this->spectrum_bar_count * 2, this->spectrum_bar_count * 2);
+        this->vis_processor_configurator, this->spectrum_bar_count * 2, this->fft_frame_size);
 
     if (asplib_error == ASPLIB_ERR_NO_ERROR) {
         this->vis_processor_initialized = true;
