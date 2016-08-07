@@ -5,20 +5,21 @@
 #include <algorithm>
 
 
-#define RING_BUF_SIZE 4096*2
+#define RING_BUF_SIZE 8192*30
+#define FFT_FRAME_SIZE 512
 
 
 Spectrum::Spectrum(int spectrum_bar_count) : 
   audio_ring_buf(RING_BUF_SIZE), 
-  fft_frame_size(RING_BUF_SIZE/4) {
+  fft_frame_size(FFT_FRAME_SIZE) {
     this->spectrum_bar_count = spectrum_bar_count;   
 
-    ASPLIB_ERR asplib_error = this->vis_processor.Create(
-        this->vis_processor_configurator, this->spectrum_bar_count * 2, this->fft_frame_size);
-
+	asplib::CSpectrumVisProcessorConfigurator vis_processor_configurator;
+    ASPLIB_ERR asplib_error = this->vis_processor.Create(vis_processor_configurator, this->spectrum_bar_count, this->fft_frame_size);
     if (asplib_error == ASPLIB_ERR_NO_ERROR) {
         this->vis_processor_initialized = true;
     }
+    this->vis_audio_data = new float[this->fft_frame_size*2];
 
     this->bar_heights  = new GLfloat[this->spectrum_bar_count];
     this->cbar_heights = new GLfloat[this->spectrum_bar_count*2];
@@ -28,6 +29,7 @@ Spectrum::Spectrum(int spectrum_bar_count) :
     std::fill_n(this->bar_heights, this->spectrum_bar_count, 0.0f);
     std::fill_n(this->cbar_heights, this->spectrum_bar_count, 1.0f);
     std::fill_n(this->pbar_heights, this->spectrum_bar_count, 0.0f);
+	std::fill_n(this->vis_audio_data, this->spectrum_bar_count*2, 0.0f);
 
 
     this->spectrum_colors = new GLfloat[this->spectrum_bar_count*3];
@@ -41,9 +43,7 @@ Spectrum::Spectrum(int spectrum_bar_count) :
 Spectrum::~Spectrum() {
     this->vis_processor.Destroy();
 
-    if ( this->vis_audio_data_initialized ) {
-        delete[] this->vis_audio_data;
-    }
+    delete[] this->vis_audio_data;
 
     delete[] this->bar_heights;
     delete[] this->cbar_heights;
@@ -52,7 +52,7 @@ Spectrum::~Spectrum() {
 }
 
 void Spectrum::audio_data(const float *audio_data, int audio_data_length) {
-    this->audio_ring_buf.write((float*)audio_data, audio_data_length);
+    this->audio_ring_buf.write((float*)audio_data, audio_data_length*2);
 }
 
 void Spectrum::draw_bar( int i, GLfloat pos_x1, GLfloat pos_x2 ) {
@@ -141,41 +141,52 @@ void Spectrum::draw_spectrum() {
             bar_width = (this->spectrum_width * 2) / this->spectrum_bar_count;
         }
 
-        uint32_t readSamples = this->audio_ring_buf.read(this->pbar_heights, this->spectrum_bar_count*4);
-        if (readSamples >= this->spectrum_bar_count*4)
-        {
-            for (int i = 0; i < this->spectrum_bar_count * 4; i++) {
-              this->pbar_heights[i] = (this->pbar_heights[i*2] + this->pbar_heights[i*2+1])*0.5f;
-            }
-            if (this->vis_processor_initialized) {
-                this->vis_processor.Process(this->pbar_heights, this->cbar_heights);
-            }
+		if (this->audio_ring_buf.get_StoredSamples() >= this->fft_frame_size*2) {
+			if (this->audio_ring_buf.read(this->vis_audio_data, this->fft_frame_size*2) >= this->fft_frame_size*2)
+			{
+				for (int i = 0; i < this->fft_frame_size; i++) {
+					this->vis_audio_data[i] = (this->vis_audio_data[i*2] + this->vis_audio_data[i*2 + 1])*0.5f;
+				}
+				if (this->vis_processor_initialized) {
+					this->vis_processor.Process(this->vis_audio_data, this->cbar_heights);
+				}
+				else {
+					// TODO: error handling
+				}
 
-            for (int i = 0; i < this->spectrum_bar_count; i++)
+				// scale spectrum data
+				for (int i = 0; i < this->spectrum_bar_count; i++) {
+            this->cbar_heights[i] = 140.0f + this->cbar_heights[i];
+            if (this->cbar_heights[i] <= 0.0f)
             {
-                this->cbar_heights[i] = 10.0f + this->cbar_heights[i];
-                this->cbar_heights[i] /= 10.0f;
+                this->cbar_heights[i] = 0.0f;
             }
-
-            for ( int i = 1; i <= this->spectrum_bar_count; i++ ) {
-                // calculate position
-                x1 = ( -this->spectrum_width ) + ( i * bar_width ) - bar_width;
-                x2 = ( -this->spectrum_width ) + ( i * bar_width );
-
-                // "add" a gap (which is 1/4 of the initial bar_width)
-                // to both the left and right side of the bar
-                gap = ( bar_width / 4 );
-                x1 = x1 + gap;
-                x2 = x2 - gap;
-
-                if ( this->spectrum_flip_horizontal ) {
-                    x1 = -x1;
-                    x2 = -x2;
-                }
-
-                draw_bar( (i-1), x1, x2 );
+            else
+            {
+                this->cbar_heights[i] /= 140.0f;
             }
-        }
+				}
+
+				for ( int i = 1; i <= this->spectrum_bar_count; i++ ) {
+					// calculate position
+					x1 = ( -this->spectrum_width ) + ( i * bar_width ) - bar_width;
+					x2 = ( -this->spectrum_width ) + ( i * bar_width );
+
+					// "add" a gap (which is 1/4 of the initial bar_width)
+					// to both the left and right side of the bar
+					gap = ( bar_width / 4 );
+					x1 = x1 + gap;
+					x2 = x2 - gap;
+
+					if ( this->spectrum_flip_horizontal ) {
+						x1 = -x1;
+						x2 = -x2;
+					}
+
+					draw_bar( (i-1), x1, x2 );
+				}
+			}
+		}
     glPopMatrix();
 }
 

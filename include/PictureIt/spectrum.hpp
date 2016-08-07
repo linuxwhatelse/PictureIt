@@ -32,7 +32,6 @@ class Spectrum {
 
         asplib::TRingBuffer<float>                audio_ring_buf;
         asplib::CSpectrumVisProcessor             vis_processor;
-        asplib::CSpectrumVisProcessorConfigurator vis_processor_configurator;
 
     public:
         /*!
