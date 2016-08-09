@@ -6,7 +6,7 @@
 
 
 #define RING_BUF_SIZE 8192*30
-#define FFT_FRAME_SIZE 512
+#define FFT_FRAME_SIZE 2048
 
 
 Spectrum::Spectrum(int spectrum_bar_count) : 
