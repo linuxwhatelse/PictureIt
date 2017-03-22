@@ -12,6 +12,7 @@ ExternalProject_Add(
 
     # Otherwise download from github
     GIT_REPOSITORY    "https://github.com/AchimTuran/asplib"
+    #GIT_TAG           "29feb337a3340401411da62e45d353d8daac834c"
     GIT_TAG           "add-spectrum-vis-processor"
 
     SOURCE_DIR        "${ASPLIB_SRC_DIR}"

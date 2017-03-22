@@ -1,21 +1,14 @@
 #include "utils.hpp"
 
-#if defined(TARGET_WINDOWS)
+#if defined(TARGET_LINUX)
+    #include <sys/time.h>
+#elif defined(TARGET_WINDOWS)
     #include <Windows.h>
     #define GL_CLAMP_TO_EDGE 0x812F
-#else
-    #include <sys/time.h>
 #endif
-
-#include <GL/gl.h>
 
 #include <dirent.h>
 
-#define STB_IMAGE_IMPLEMENTATION
-#define STBI_ONLY_JPEG
-#define STBI_ONLY_PNG
-#define STBI_ONLY_BMP
-#include "stb_image.h"
 
 namespace PI_UTILS {
     string path_join(string a, string b) {
@@ -85,38 +78,6 @@ namespace PI_UTILS {
         }
     
         closedir(dp);
-        return true;
-    }
-
-    bool load_image(const char *img_path, GLuint texture_id, int &width, int &height) {
-        if ( ! texture_id ) {
-            return false;
-        }
-
-        int x, y, n;
-        unsigned char *data = stbi_load(img_path, &x, &y, &n, 0);
-    
-        width = x;
-        height = y;
-
-        if(data == nullptr) {
-            return false;
-        }
-    
-        glEnable(GL_TEXTURE_2D);
-            glBindTexture(GL_TEXTURE_2D, texture_id);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        
-            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,  GL_LINEAR );
-            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,  GL_LINEAR );
-            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,      GL_CLAMP_TO_EDGE );
-            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,      GL_CLAMP_TO_EDGE );
-        
-            glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-        glDisable(GL_TEXTURE_2D);
-
-        stbi_image_free(data);
-
         return true;
     }
 

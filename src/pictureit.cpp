@@ -2,81 +2,80 @@
 #include "utils.hpp"
 
 #include <algorithm>
-#include <GL/gl.h>
 
-const char *PictureIt::image_filter[] = { ".jpg", ".png", ".jpeg", ".JPG", ".PNG", ".JPEG" };
+
+const char *PictureIt::image_filter[] = {
+    ".jpg", ".png", ".jpeg", ".bmp",
+    ".JPG", ".PNG", ".JPEG", ".BMP"
+};
 
 PictureIt::~PictureIt() {
-    delete this->efx;
+    delete this->renderer;
 
-    glDeleteTextures(2, this->img_texture_ids);
+    delete this->textures[0];
+    delete this->textures[1];
 }
 
-EFX PictureIt::get_img_transition_efx() {
-    return this->img_transition_efx;
-}
-
-bool PictureIt::set_img_transition_efx(EFX efx) {
-    if ( ! this->img_effect_finished )
+bool PictureIt::set_transition(ITransition::TRANSITION t) {
+    if (! this->transition_done)
         return false;
 
-    MODE image_mode = MODE::ZOOM;
-    if ( this->efx )
-        image_mode = this->efx->image_mode;
+    delete this->transition;
+    this->transition = PIFactory::get_transition(t);
+    this->active_transition = t;
 
-    delete this->efx;
+    delete this->textures[0];
+    delete this->textures[1];
 
-    switch ( efx ) {
-        default:
-        case EFX::CROSSFADE:
-            this->efx = new EFXCrossfade();
-            this->img_transition_efx = EFX::CROSSFADE;
-            break;
-        case EFX::SLIDE:
-            this->efx = new EFXSlide();
-            this->img_transition_efx = EFX::SLIDE;
-            break;
-    }
+    this->textures[0] = PIFactory::get_texture();
+    this->textures[1] = PIFactory::get_texture();
 
-    this->efx->image_mode = image_mode;
+    //this->textures[0] = this->active_transition->get_texture();
+    //this->textures[1] = this->active_transition->get_texture();
 
-    this->efx->new_image_width  = this->image_width;
-    this->efx->new_image_height = this->image_height;
+    this->set_display_mode(this->active_mode);
 
     return true;
 };
 
-void PictureIt::start_render() {
-    // save OpenGL original state
-    glPushAttrib( GL_ENABLE_BIT | GL_TEXTURE_BIT );
 
-    // Clear The Screen And The Depth Buffer
-    glClear( GL_COLOR_BUFFER_BIT );
+bool PictureIt::set_display_mode(ITexture::MODE mode) {
+    switch (mode) {
+        default:
+        case ITexture::MODE::STRETCH:
+            this->textures[0]->stretch();
+            this->textures[1]->stretch();
+            break;
+        case ITexture::MODE::CENTER:
+            this->textures[0]->center();
+            this->textures[1]->center();
+            break;
+        case ITexture::MODE::SCALE:
+            this->textures[0]->scale();
+            this->textures[1]->scale();
+            break;
+        case ITexture::MODE::ZOOM:
+            this->textures[0]->zoom();
+            this->textures[1]->zoom();
+            break;
+    }
 
-    // OpenGL projection matrix setup
-    glMatrixMode( GL_PROJECTION );
-    glPushMatrix();
-    glLoadIdentity();
+    this->active_mode = mode;
 
-    // Coordinate-System:
-    //     screen top left:     ( -1, -1 )
-    //     screen center:       (  0,  0 )
-    //     screen bottom right: (  1,  1 )
-    glOrtho( -1, 1, 1, -1, -1, 1 );
-
-    glMatrixMode( GL_MODELVIEW );
-    glPushMatrix();
-    glLoadIdentity();
+    return true;
 }
 
-void PictureIt::finish_render() {
-    // return OpenGL matrices to original state
-    glPopMatrix();
-    glMatrixMode( GL_PROJECTION );
-    glPopMatrix();
+void PictureIt::set_window_size(int width, int height) {
+    this->win_width = width;
+    this->win_height = height;
 
-    // restore OpenGl original state
-    glPopAttrib();
+    this->textures[0]->win_width  = width;
+    this->textures[0]->win_height = height;
+
+    this->textures[1]->win_width  = width;
+    this->textures[1]->win_height = height;
+
+    this->set_display_mode(this->active_mode);
 }
 
 const char* PictureIt::get_random_image() {
@@ -85,99 +84,117 @@ const char* PictureIt::get_random_image() {
     return this->images[index].c_str();
 }
 
-const char* PictureIt::get_next_image() {
-    if ( this->img_current_index < this->images.size() )
-        this->img_current_index++;
-    else
-        this->img_current_index = 0;
 
-    return this->images[this->img_current_index].c_str();
+const char* PictureIt::get_next_image() {
+    if (this->current_image_index < this->images.size()) {
+        this->current_image_index++;
+    } else {
+        this->current_image_index = 0;
+    }
+
+    return this->images[this->current_image_index].c_str();
 }
 
+
 bool PictureIt::render() {
-    start_render();
+    this->renderer->prepare();
 
-    if ( ! this->images.empty() ) {
-        if ( this->img_update_by_interval && this->img_effect_finished &&
-            PI_UTILS::get_time_in_ms() >= ( this->img_last_updated + (this->img_update_interval * 1000) ))
-            img_update = true;
+    if (! this->images.empty()) {
+        // Check whether or not to update the current image
+        if (this->img_update_by_interval && this->transition_done &&
+            PI_UTILS::get_time_in_ms() >= (this->img_last_updated +
+                                          (this->img_update_interval * 1000))) {
+            this->img_update = true;
+        }
 
-        if ( this->img_update == true ) {
-            this->img_last_updated    = PI_UTILS::get_time_in_ms();
-            this->img_effect_finished = false;
-            this->img_update          = false;
+        if (this->img_update == true) {
+            this->img_last_updated = PI_UTILS::get_time_in_ms();
+            this->transition_done  = false;
+            this->img_update       = false;
 
+            // Get a new image
             const char* img_path;
-            if ( this->img_pick_random )
+            if (this->img_pick_random) {
                 img_path = get_random_image();
-            else
-                img_path = get_next_image();
-
-            efx->old_image_width  = efx->new_image_width;
-            efx->old_image_height = efx->new_image_height;
-
-            bool success = PI_UTILS::load_image( img_path, img_texture_ids[1], image_width, image_height );
-            if ( ! success ) {
-                // Faild loading image, so when drawing the next frame we immediatelly try to get a new one
-                // If we'd do it in the "load_image" methode we could end up in an endless-loop in the main-thread
-                // if only broken images are available within a preset
-                this->img_update = true;
             } else {
-                efx->new_image_width  = this->image_width;
-                efx->new_image_height = this->image_height;
+                img_path = get_next_image();
+            }
+
+            if (this->textures[1]->load_image(img_path)) {
+                // Set our window width/height and apply the
+                // current display mode to our new texture
+                this->textures[1]->win_height = this->win_width;
+                this->textures[1]->win_width = this->win_height;
+                this->set_display_mode(this->active_mode);
+            } else {
+                // Failed loading image, so when drawing the next frame we
+                // immediately try to get a new one. If we'd do it in the
+                // "load_image" methode we could end up in an endless-loop in
+                // the main-thread if only broken images are available within
+                // a the images vector.
+                this->img_update = true;
             }
         }
 
-        // Window size might suddenly change, therefore we update it every frame
-        efx->window_width  = this->window_width;
-        efx->window_height = this->window_height;
 
-        if ( this->img_effect_finished ) {
-            // From now on we keep drawing the current image ourself up to the point
-            // where a new image will be displayed which will be done by an effect again
-            efx->draw_image(this->img_texture_ids[0], true);
+        if (this->transition_done) {
+            // From now on we keep drawing the current image ourself up
+            // to the point where a new image will be displayed which will be
+            // done by an effect again
+            this->textures[0]->render();
         } else {
-            if ( glIsTexture(this->img_texture_ids[0]) ) {
-                this->img_effect_finished = efx->render(this->img_texture_ids[0], this->img_texture_ids[1]);
+            if (this->textures[0]->is_texture()) {
+                // Previous image, transition from previous to new
+                this->transition_done = this->transition->update(
+                    this->textures[0], this->textures[1]);
+                this->set_display_mode(this->active_mode);
+                this->textures[0]->render();
+                this->textures[1]->render();
             } else {
-                this->img_effect_finished = efx->render(0, this->img_texture_ids[1]);
+                // No previous image, transition from black to new
+                this->transition_done = this->transition->update(
+                    nullptr, this->textures[1]);
+                this->set_display_mode(this->active_mode);
+                this->textures[1]->render();
             }
 
-            // Effect finished, therefore we have to swapp the position of both textures
-            if ( this->img_effect_finished ) {
-                swap(this->img_texture_ids[0], this->img_texture_ids[1]);
+            // Effect finished, therefore we have to swap the position of both
+            // textures
+            if (this->transition_done) {
+                swap(this->textures[0], this->textures[1]);
 
-                // e.g. Kodi needs that. Without it, it looks like one frame is missing once
-                // the effect finished.
-                // It doesn't hurt so it's fine for now
-                efx->draw_image(this->img_texture_ids[0], true);
+                this->textures[0]->render();
             }
         }
     }
 
-    if ( this->spectrum_enabled ) {
+    if (this->spectrum_enabled) {
         draw_spectrum();
     }
 
-    finish_render();
+    this->renderer->finish();
 
-    return this->img_effect_finished;
+    return this->transition_done;
 }
 
+
 void PictureIt::update_image(bool force_update) {
-    if ( force_update ) {
+    if (force_update) {
         this->img_update = true;
     } else {
-        if ( this->img_effect_finished ) {
+        if (this->transition_done) {
             this->img_update = true;
         }
     }
 }
 
+
 void PictureIt::load_images(const char *image_root_dir) {
-    img_current_index = -1;
+    current_image_index = -1;
     images.clear();
 
-    PI_UTILS::list_dir(image_root_dir, this->images, true, true, this->image_filter, sizeof( this->image_filter ));
-    sort( this->images.begin(), this->images.end() );
+    PI_UTILS::list_dir(image_root_dir, this->images, true, true,
+        this->image_filter, sizeof(this->image_filter));
+
+    sort(this->images.begin(), this->images.end());
 }

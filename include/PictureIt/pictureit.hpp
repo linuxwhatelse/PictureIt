@@ -2,64 +2,103 @@
 
 #include "utils.hpp"
 #include "spectrum.hpp"
-#include "effects/effects.hpp"
+
+#include "Factory.hpp"
+#include "abstract/IRenderer.hpp"
 
 #include <string>
 #include <vector>
 
-using namespace std;
 
 class PictureIt : public Spectrum {
     private:
-        /*
-        :img_texture_ids: holds the texture-ids for images:
-           0: The current displayed image.
-           1: The next image which fades in.
+        /*!
+         * @brief Filter for image types
+         */
+        static const char *image_filter[];
+
+        /*!
+         * @brief Textures to be drawn
+         *        0: The currently displayed texture.
+         *        1: The next texture
         */
-        GLuint  img_texture_ids[2]  =  {};
-        bool    img_update          =  true;
-        int     img_current_index   =  -1;
-        long    img_last_updated    =  PI_UTILS::get_time_in_ms();
-        bool    img_effect_finished =  true;
-        EFX     img_transition_efx  =  EFX::CROSSFADE;
+        ITexture *textures[2];
 
-        int image_width            =  0;
-        int image_height           =  0;
+        /*!
+         * @biref The windows current width. See `set_window_size`.
+         */
+        int win_width = 0;
+        /*!
+         * @biref The windows current height. See `set_window_size`.
+         */
+        int win_height = 0;
 
+        /*!
+         * @brief Whether or not to update to the next image.
+         */
+        bool img_update = true;
+        /*!
+         * @brief Time in ms when the image was last updated.
+         */
+        long img_last_updated = PI_UTILS::get_time_in_ms();
+
+        /*!
+         * @brief List of image-paths to be displayed.
+         */
         vector<string> images;
 
-		static const char *image_filter[];
+        /*!
+         * @brief Index of the currently displayed image. See `images` and 'get_next_image()'.
+         */
+        int current_image_index = -1;
 
-        void start_render();
-        void finish_render();
+        /*!
+         * @brief Whether or not a transition is in progress.
+         */
+        bool transition_done = true;
+
+        /*!
+         * @brief The currently active transition.
+         */
+        ITransition::TRANSITION active_transition = ITransition::TRANSITION::CROSSFADE;
+
+        /*!
+         * @brief The currently active display mode.
+         */
+        ITexture::MODE active_mode = ITexture::MODE::STRETCH;
+
+
+        /*!
+         * @brief A abstract renderer instance to prepare, finish, ... frames.
+         */
+        IRenderer *renderer = nullptr;
+
+        /*!
+         * @brief Pick a random image to be displayed. See 'images'.
+         * @returns An absolute path to an images.
+         */
         const char* get_random_image();
+        /*!
+         * @brief Pick the next image to be displayed. See `images`.
+         * @returns An absolute path to an images.
+         */
         const char* get_next_image();
 
     public:
         /*!
-         * @brief Pointer to the currently active effect used to transition between images
-         * See :set_img_transition_efx: on how to change it
+         * @brief A abstract instance of an active transition which can be used
+                  to configure said transition via its `configure` method.
          */
-        EFXBase *efx = NULL;
+        ITransition *transition = nullptr;
 
         /*!
-         * @brief Width in pixel of the window rendering this visualization
-         */
-        int window_width = 0;
-
-        /*!
-         * @brief Height in pixel of the window rendering this visualization
-         */
-        int window_height = 0;
-
-        /*!
-         * @brief If a random images should be picked everytime the image updates
+         * @brief If a random images should be picked every time the image updates
          * If set to :false: the images will be displayed in alphabetical order
          */
         bool img_pick_random = true;
 
         /*!
-         * @brief Whether the images should be updated by intervall or not
+         * @brief Whether the images should be updated by interval or not
          */
         bool img_update_by_interval = true;
 
@@ -78,25 +117,60 @@ class PictureIt : public Spectrum {
          * @param spectrum_bar_count Amount of bars the spectrum should have. This excludes the mirrored parts
          */
         PictureIt(int spectrum_bar_count = 64): Spectrum(spectrum_bar_count) {
-            set_img_transition_efx(this->img_transition_efx);
+            this->renderer = PIFactory::get_renderer();
+            this->renderer->init();
 
-            glGenTextures(2, this->img_texture_ids);
+            this->textures[0] = PIFactory::get_texture();
+            this->textures[1] = PIFactory::get_texture();
+
+            this->set_transition(this->active_transition);
         };
 
+        /*!
+         * @brief PictureIt destructor.
+         */
         ~PictureIt();
+
+        /*!
+         * @brief PictureIt needs to know about the windows width and height
+         *        to properly scale images.
+         *        Whenever the windows size changes, call this method with
+         *        the windows new width and height.
+         * @param width The windows new width value
+         * @param height The windows new height value
+         */
+        void set_window_size(int width, int height);
 
         /*!
          * @brief If NO transition is active, sets the new transition effect
          * @param efx Effect to activate. Available effects are defined in the effects.h file within the :EFX: enum
          * @return true if the new effect was activated, false otherwise
          */
-        bool set_img_transition_efx(EFX efx);
+        bool set_transition(ITransition::TRANSITION t);
+
+        /*!
+         * @brief If NO transition is active, sets the new transition effect
+         * @param mode Display mode to set. Available modes are defined in
+            the effects.h file within the :EFX: enum
+         * @return true if the new effect was activated, false otherwise
+         */
+        bool set_display_mode(ITexture::MODE mode);
 
         /*!
          * @brief Get the current image transition effect
          * @return the current image transition effect
          */
-        EFX get_img_transition_efx();
+        ITransition::TRANSITION get_transition() {
+            return this->active_transition;
+        };
+
+        /*!
+         * @brief Get the current image display mode
+         * @return the current image display mode
+         */
+        ITexture::MODE get_display_mode() {
+            return this->active_mode;
+        };
 
         /*!
          * @brief Display the next image

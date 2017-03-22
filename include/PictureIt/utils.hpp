@@ -3,8 +3,6 @@
 #include <string>
 #include <vector>
 
-#include <GL/gl.h>
-
 using namespace std;
 
 namespace PI_UTILS {
@@ -35,14 +33,6 @@ namespace PI_UTILS {
      * @return true if successful, false otherwise
      */
     bool list_dir(const char *path, vector<string> &store, bool recursive = false, bool incl_full_path = true, const char *file_filter[] = NULL, int filter_size = 0);
-
-    /*!
-     * @brief Loads a image into a OpenGL texture
-     * @param img_path path to an image
-     * @param texture_id OpenGL texture-id to map bind the image to (check OpenGLs :glGenTextures(): on how to create one)
-     * @return true if successful, false otherwise
-     */
-    bool load_image(const char *img_path, GLuint texture_id, int &width, int &height);
 
     /*!
      * @brief Get current time in milliseconds
