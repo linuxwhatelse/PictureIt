@@ -1,3 +1,10 @@
 @PACKAGE_INIT@
 
-include(${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@-targets.cmake)
+if(NOT TARGET PictureIt)
+    include(${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@-targets.cmake)
+endif()
+
+set_and_check(PictureIt_INCLUDE_DIR @PACKAGE_PictureIt_INCLUDE_DIR@)
+
+set(PictureIt_LIBRARY @PROJECT_NAME@::@PROJECT_NAME@)
+set(PictureIt_INCLUDE_DIRS ${PictureIt_INCLUDE_DIR})

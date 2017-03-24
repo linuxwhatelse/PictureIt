@@ -29,17 +29,20 @@ include_directories(${OPENGL_INCLUDE_DIR})
 list(APPEND DEPLIBS ${OPENGL_gl_LIBRARY})
 
 
+# Include KissFFT
+#include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/depends/KissFFT/add_KissFFT.cmake)
+#list(APPEND DEPLIBS KissFFT)
+
+
 # Include asplib
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/depends/asplib/add_asplib.cmake)
-list(APPEND DEPLIBS asplib::Core asplib::SpectrumVisProcessor)
+#include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/depends/asplib/add_asplib.cmake)
+#list(APPEND DEPLIBS asplib::Core asplib::SpectrumVisProcessor)
 
 
 # Set PictureIt source and header files
 set(SOURCES src/pictureit.cpp
             src/spectrum.cpp
             src/utils.cpp
-
-            src/abstract/ITexture.cpp
 
             src/transitions/crossfade.cpp
             src/transitions/slide.cpp
@@ -94,7 +97,8 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 # - If you use it in public headers -> INTERFACE
 # - If both: PUBLIC
 
-set(INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include/PictureIt
+set(PictureIt_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
+set(INCLUDES ${PictureIt_INCLUDE_DIR}/PictureIt
              ${CMAKE_CURRENT_SOURCE_DIR}/deps)
 if(WIN32)
     list(APPEND INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/deps/win32)
@@ -103,14 +107,14 @@ endif()
 target_include_directories(${PROJECT_NAME}
                            PRIVATE ${INCLUDES}
                            INTERFACE
-                               $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-                               $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/PictureIt>
+                               $<BUILD_INTERFACE:${PictureIt_INCLUDE_DIR}>
+                               $<BUILD_INTERFACE:${PictureIt_INCLUDE_DIR}/PictureIt>
                                $<INSTALL_INTERFACE:include>
                                $<INSTALL_INTERFACE:include>/PictureIt)
 
 
 # Install PictureIt header files.
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include DESTINATION ${CMAKE_INSTALL_PREFIX})
+install(DIRECTORY ${PictureIt_INCLUDE_DIR} DESTINATION ${CMAKE_INSTALL_PREFIX})
 
 # Export PictureIt target.
 install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
@@ -140,8 +144,11 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
 # Generate and install PictureIt configure file that is used by find_package(...).
 # This file makes an find module obsolute, if your project
 # sets CMAKE_PREFIX_PATH to the install path of PictureIt.
-configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
-                              INSTALL_DESTINATION ${CMAKE_INSTALL_CMAKECONFIGDIR})
+configure_package_config_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_CMAKECONFIGDIR}
+    PATH_VARS PictureIt_INCLUDE_DIR)
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
         DESTINATION ${CMAKE_INSTALL_CMAKECONFIGDIR})
