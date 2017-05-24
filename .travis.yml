@@ -3,6 +3,23 @@ compiler: gcc
 sudo: required
 dist: trusty
 
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test # gcc
+      - george-edison55-precise-backports # cmake 3.2.3
+    packages:
+      - g++-6
+      - cmake
+      - cmake-data
+      - libfftw3-dev
+      - libglm-dev
+      - libglew-dev
+
+install:
+    - if [ "$CXX" = "g++" ]; then export CXX="g++-6" CC="gcc-6"; fi
+
 script:
   - cd "$TRAVIS_BUILD_DIR"
-  - cmake ./ && make
+  - mkdir build && cd build
+  - cmake ../ && make

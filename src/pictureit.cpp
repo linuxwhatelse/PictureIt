@@ -2,6 +2,14 @@
 #include "utils.hpp"
 
 #include <algorithm>
+#include <chrono>
+#include <stdexcept>
+#include <thread>
+
+#define GLM_FORCE_RADIANS
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 
 const char *PictureIt::image_filter[] = {
@@ -9,191 +17,189 @@ const char *PictureIt::image_filter[] = {
     ".JPG", ".PNG", ".JPEG", ".BMP"
 };
 
-PictureIt::~PictureIt() {
-    delete this->renderer;
-
-    delete this->textures[0];
-    delete this->textures[1];
-}
-
-bool PictureIt::set_transition(ITransition::TRANSITION t) {
-    if (! this->transition_done)
-        return false;
-
-    delete this->transition;
-    this->transition = PIFactory::get_transition(t);
-    this->active_transition = t;
-
-    delete this->textures[0];
-    delete this->textures[1];
-
-    this->textures[0] = PIFactory::get_texture();
-    this->textures[1] = PIFactory::get_texture();
-
-    //this->textures[0] = this->active_transition->get_texture();
-    //this->textures[1] = this->active_transition->get_texture();
-
-    this->set_display_mode(this->active_mode);
-
-    return true;
-};
+const std::chrono::time_point<std::chrono::high_resolution_clock> t_start =
+    std::chrono::high_resolution_clock::now();
 
 
-bool PictureIt::set_display_mode(ITexture::MODE mode) {
-    switch (mode) {
-        default:
-        case ITexture::MODE::STRETCH:
-            this->textures[0]->stretch();
-            this->textures[1]->stretch();
-            break;
-        case ITexture::MODE::CENTER:
-            this->textures[0]->center();
-            this->textures[1]->center();
-            break;
-        case ITexture::MODE::SCALE:
-            this->textures[0]->scale();
-            this->textures[1]->scale();
-            break;
-        case ITexture::MODE::ZOOM:
-            this->textures[0]->zoom();
-            this->textures[1]->zoom();
-            break;
+PictureIt::PictureIt(Config::PictureIt pi_cfg) : cfg(pi_cfg) {
+    GLenum err = glewInit();
+    if (err != GLEW_OK) {
+        fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
+        exit(1);
     }
 
-    this->active_mode = mode;
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    return true;
+    this->bg_cfg.mode = pi_cfg.display_mode;
+    this->bg_cfg.transition_in = pi_cfg.transition;
+    this->bg_cfg.transition_out = pi_cfg.transition;
+
+    this->load_images();
+};
+
+PictureIt::~PictureIt() {}
+
+const unsigned int PictureIt::add_spectrum(const Config::Spectrum& cfg) {
+    const unsigned int id = this->spectra.size() + 1;
+
+    this->spectra.push_back(make_unique<Spectrum>(cfg, id));
+    return id;
+}
+
+bool PictureIt::remove_spectrum(unsigned int id) {
+    for(unsigned i = 0; i < this->spectra.size(); i++) {
+        if (this->spectra.at(i)->get_id() == id) {
+            this->spectra.erase(this->spectra.begin() + i);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+//const unsigned int PictureIt::add_texture(const Config::Texture& cfg) {
+PictureIt::tex_ptr PictureIt::add_texture(const Config::Texture& cfg) {
+    // As the id directly relates to the texture unit, we have to add our fixed
+    // background textures to the dynamic size of textures
+    const unsigned int id = (this->textures.size() + (sizeof(this->background) /
+                             sizeof(*this->background)) + 1);
+
+    tex_ptr tex = make_shared<Texture>(cfg, id);
+    this->textures.push_back(move(tex));
+
+    return tex;
+}
+
+bool PictureIt::remove_texture(unsigned int id, bool force) {
+    for(unsigned i = 0; i < this->textures.size(); i++) {
+        if (this->textures.at(i)->get_id() == id) {
+            if (force) {
+                this->textures.erase(this->textures.begin() + i);
+            } else {
+                this->textures.at(i)->hide();
+            }
+
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void PictureIt::set_window_size(int width, int height) {
     this->win_width = width;
     this->win_height = height;
 
-    this->textures[0]->win_width  = width;
-    this->textures[0]->win_height = height;
-
-    this->textures[1]->win_width  = width;
-    this->textures[1]->win_height = height;
-
-    this->set_display_mode(this->active_mode);
+    glViewport(0, 0, width, height);
 }
 
-const char* PictureIt::get_random_image() {
-    int index = rand() % this->images.size();
-
-    return this->images[index].c_str();
-}
-
-
-const char* PictureIt::get_next_image() {
-    if (this->current_image_index < this->images.size()) {
-        this->current_image_index++;
+string PictureIt::get_new_image() {
+    if (this->cfg.pick_random) {
+        int size = this->images.size();
+        this->current_image_index = Utils::get_random(0, size - 1);
     } else {
-        this->current_image_index = 0;
+        if (this->current_image_index < this->images.size()) {
+            this->current_image_index++;
+        } else {
+            this->current_image_index = 0;
+        }
     }
 
-    return this->images[this->current_image_index].c_str();
+    return this->images[this->current_image_index];
 }
 
+void PictureIt::draw(FFT& fft) {
+    std::chrono::time_point<std::chrono::steady_clock> t_fps = (
+        std::chrono::steady_clock::now() +
+            std::chrono::microseconds(1000000 / this->cfg.max_fps - 100));
 
-bool PictureIt::render() {
-    this->renderer->prepare();
+    glClearColor(this->cfg.bg_color[0], this->cfg.bg_color[1],
+                 this->cfg.bg_color[2], this->cfg.bg_color[3]);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // Handle background image
     if (! this->images.empty()) {
         // Check whether or not to update the current image
-        if (this->img_update_by_interval && this->transition_done &&
-            PI_UTILS::get_time_in_ms() >= (this->img_last_updated +
-                                          (this->img_update_interval * 1000))) {
+        if (this->cfg.update_by_interval &&
+            Utils::get_time_in_ms() >= (this->img_last_updated +
+                                        (this->cfg.update_interval * 1000))) {
             this->img_update = true;
         }
 
         if (this->img_update == true) {
-            this->img_last_updated = PI_UTILS::get_time_in_ms();
-            this->transition_done  = false;
-            this->img_update       = false;
+            this->img_update = false;
+            this->img_last_updated = Utils::get_time_in_ms();
 
-            // Get a new image
-            const char* img_path;
-            if (this->img_pick_random) {
-                img_path = get_random_image();
+            if (this->background[0] == nullptr) {
+                // Setup / First time we do something
+                this->bg_cfg.path = get_new_image();
+                this->background[0] = make_unique<Texture>(this->bg_cfg, 0);
             } else {
-                img_path = get_next_image();
-            }
+                // Subsequential runs where we update and transition between
+                // two images
+                this->background[0]->hide();
 
-            if (this->textures[1]->load_image(img_path)) {
-                // Set our window width/height and apply the
-                // current display mode to our new texture
-                this->textures[1]->win_height = this->win_width;
-                this->textures[1]->win_width = this->win_height;
-                this->set_display_mode(this->active_mode);
-            } else {
-                // Failed loading image, so when drawing the next frame we
-                // immediately try to get a new one. If we'd do it in the
-                // "load_image" methode we could end up in an endless-loop in
-                // the main-thread if only broken images are available within
-                // a the images vector.
-                this->img_update = true;
+                this->bg_cfg.path = get_new_image();
+                if (this->background[1] == nullptr) {
+                    this->background[1] = make_unique<Texture>(this->bg_cfg, 1);
+                } else {
+                    this->background[1]->configure(this->bg_cfg);
+                }
             }
         }
 
+        if (this->background[0]->is_hidden()) {
+            swap(this->background[0], this->background[1]);
+        }
 
-        if (this->transition_done) {
-            // From now on we keep drawing the current image ourself up
-            // to the point where a new image will be displayed which will be
-            // done by an effect again
-            this->textures[0]->render();
-        } else {
-            if (this->textures[0]->is_texture()) {
-                // Previous image, transition from previous to new
-                this->transition_done = this->transition->update(
-                    this->textures[0], this->textures[1]);
-                this->set_display_mode(this->active_mode);
-                this->textures[0]->render();
-                this->textures[1]->render();
-            } else {
-                // No previous image, transition from black to new
-                this->transition_done = this->transition->update(
-                    nullptr, this->textures[1]);
-                this->set_display_mode(this->active_mode);
-                this->textures[1]->render();
-            }
-
-            // Effect finished, therefore we have to swap the position of both
-            // textures
-            if (this->transition_done) {
-                swap(this->textures[0], this->textures[1]);
-
-                this->textures[0]->render();
-            }
+        // Draw background images
+        for (tex_ptr& texture: this->background) {
+            if (texture != nullptr && texture->is_valid()
+                    && ! texture->is_hidden())
+                texture->draw();
         }
     }
 
-    if (this->spectrum_enabled) {
-        draw_spectrum();
+
+    // Draw User defined textures
+    for(unsigned i = 0; i < this->textures.size(); i++) {
+        this->textures.at(i);
+        if (! this->textures.at(i)->is_valid())
+            continue;
+
+        if (this->textures.at(i)->is_hidden()) {
+            this->textures.erase(this->textures.begin() + i);
+            continue;
+        }
+
+        this->textures.at(i)->draw();
     }
 
-    this->renderer->finish();
 
-    return this->transition_done;
+    // Draw user defined spectra
+    for (spec_ptr& spectrum: this->spectra) {
+        spectrum->update_fft(fft);
+        spectrum->draw();
+    }
+
+    // Limit fps
+    std::this_thread::sleep_until(t_fps);
 }
 
+bool PictureIt::next_image() {
+    if (this->background[0] != nullptr &&
+            this->background[0]->is_transitioning())
+        return false;
 
-void PictureIt::update_image(bool force_update) {
-    if (force_update) {
-        this->img_update = true;
-    } else {
-        if (this->transition_done) {
-            this->img_update = true;
-        }
-    }
+    this->img_update = true;
 }
 
-
-void PictureIt::load_images(const char *image_root_dir) {
+void PictureIt::load_images() {
     current_image_index = -1;
     images.clear();
 
-    PI_UTILS::list_dir(image_root_dir, this->images, true, true,
+    Utils::list_dir(this->cfg.image_dir, this->images, this->cfg.recursive, true,
         this->image_filter, sizeof(this->image_filter));
 
     sort(this->images.begin(), this->images.end());

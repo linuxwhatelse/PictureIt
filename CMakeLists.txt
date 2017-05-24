@@ -1,11 +1,12 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.1)
 
 project(PictureIt LANGUAGES CXX VERSION 0.0.1)
+set(CMAKE_BUILD_TYPE Debug)
 
-if(MSVC)
-    add_definitions(-DTARGET_WINDOWS)
-elseif(UNIX)
+if(UNIX)
     add_definitions(-DTARGET_LINUX)
+else()
+    message(FATAL_ERROR "This plattform is NOT supported!")
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
@@ -23,52 +24,66 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 
-# Include OpenGL
-include(FindOpenGL)
-include_directories(${OPENGL_INCLUDE_DIR})
-list(APPEND DEPLIBS ${OPENGL_gl_LIBRARY})
+# Include GLEW
+find_package(GLEW REQUIRED)
+include_directories(${GLEW_INCLUDE_DIRS})
+list(APPEND DEPLIBS ${GLEW_LIBRARIES})
 
 
-# Include KissFFT
-#include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/depends/KissFFT/add_KissFFT.cmake)
-#list(APPEND DEPLIBS KissFFT)
+# Include GLM
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindGLM.cmake)
+find_package(GLM REQUIRED)
+include_directories(${GLM_INCLUDE_DIRS})
+add_definitions(${GLM_DEFINITIONS})
 
 
-# Include asplib
-#include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/depends/asplib/add_asplib.cmake)
-#list(APPEND DEPLIBS asplib::Core asplib::SpectrumVisProcessor)
+# Include FFTW
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindFFTW.cmake)
+find_package(FFTW REQUIRED)
+include_directories(${FFTW_INCLUDES})
+list(APPEND DEPLIBS ${FFTW_LIBRARIES})
 
 
 # Set PictureIt source and header files
 set(SOURCES src/pictureit.cpp
-            src/spectrum.cpp
             src/utils.cpp
+            src/fft.cpp
+            src/buffer.cpp
+            src/program.cpp
 
+            src/texture/texture.cpp
             src/transitions/crossfade.cpp
             src/transitions/slide.cpp
+
+            src/spectrum/spectrum.cpp
 )
 
 set(HEADERS include/PictureIt/pictureit.hpp
-            include/PictureIt/spectrum.hpp
             include/PictureIt/utils.hpp
+            include/PictureIt/fft.hpp
+            include/PictureIt/buffer.hpp
+            include/PictureIt/program.hpp
 
-            include/PictureIt/Factory.hpp
+            include/PictureIt/config.hpp
+            include/PictureIt/gl_utils.hpp
+            include/PictureIt/input.hpp
 
-            include/PictureIt/abstract/IRenderer.hpp
-            include/PictureIt/abstract/ITexture.hpp
-            include/PictureIt/abstract/ITransition.hpp
+            include/PictureIt/texture/texture.hpp
 
+            include/PictureIt/transitions/factory.hpp
+            include/PictureIt/transitions/itransition.hpp
             include/PictureIt/transitions/crossfade.hpp
             include/PictureIt/transitions/slide.hpp
+
+            include/PictureIt/spectrum/spectrum.hpp
+
 )
 
-
-if(UNIX)
-    list(APPEND SOURCES src/abstract/OGLRenderer.cpp
-                        src/abstract/OGLTexture.cpp)
-    list(APPEND HEADERS include/PictureIt/abstract/OGLRenderer.hpp
-                        include/PictureIt/abstract/OGLTexture.hpp)
-endif()
+set(SHADERS src/spectrum/shader/bar.geom
+            src/spectrum/shader/bar_pre.vert
+            src/spectrum/shader/bar.vert
+            src/spectrum/shader/simple.frag
+)
 
 
 # Create PictureIt static library.
@@ -77,9 +92,9 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES} ${HEADERS})
 
 # Define PictureIt namespace, which is very useful for exporting the PictureIt target.
 # ------------------------------------------------------------------------------------------------
-# The alias target can be used within the project and ensures with its :: name that 
-# target_link_libraries fails already at configure time when the target is not here. 
-# Without that, cmake would just assume that it's a system lib and just adds -llib to the 
+# The alias target can be used within the project and ensures with its :: name that
+# target_link_libraries fails already at configure time when the target is not here.
+# Without that, cmake would just assume that it's a system lib and just adds -llib to the
 # linker flag, which would only show errors at link time.
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
@@ -100,9 +115,7 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 set(PictureIt_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 set(INCLUDES ${PictureIt_INCLUDE_DIR}/PictureIt
              ${CMAKE_CURRENT_SOURCE_DIR}/deps)
-if(WIN32)
-    list(APPEND INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/deps/win32)
-endif()
+
 
 target_include_directories(${PROJECT_NAME}
                            PRIVATE ${INCLUDES}
@@ -155,7 +168,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
 
 
 # Export all targets that are included in the namespace PictureIt.
-# Furthermore this will generate the necessary code for PictureIt 
+# Furthermore this will generate the necessary code for PictureIt
 # import as a CMake target for free.
 install(EXPORT ${PROJECT_NAME} FILE ${PROJECT_NAME}-targets.cmake NAMESPACE ${CMAKE_PROJECT_NAME}::
         DESTINATION ${CMAKE_INSTALL_CMAKECONFIGDIR})

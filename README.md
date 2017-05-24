@@ -5,5 +5,9 @@ PictureIt Visualization
 This project is in heavy development and should't be used in its current state  
 as core functionality changes quite often.  
   
-Once the project reaches a somewhat stable state, I'll add documentation  
-on how to use it.
+### Requirements:
+ - gcc-6+
+ - cmake 3.1+
+ - glew
+ - glm
+ - fftw3
