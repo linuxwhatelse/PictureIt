@@ -5,6 +5,7 @@
 #include <chrono>
 #include <stdexcept>
 #include <thread>
+#include <sstream>
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
@@ -24,8 +25,11 @@ const std::chrono::time_point<std::chrono::high_resolution_clock> t_start =
 PictureIt::PictureIt(Config::PictureIt pi_cfg) : cfg(pi_cfg) {
     GLenum err = glewInit();
     if (err != GLEW_OK) {
-        fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
-        exit(1);
+        std::stringstream msg;
+        msg << "Could not initialize GLEW!" \
+            << " Reason: " << glewGetErrorString(err) \
+            << ", err code: " << err;
+        throw std::runtime_error(msg.str().c_str());
     }
 
     glEnable(GL_BLEND);
