@@ -19,9 +19,9 @@
 
 #pragma once
 
+#include "gl_lite.hpp"
 #include "gl_utils.hpp"
 
-#include <GL/glew.h>
 #include <initializer_list>
 #include <functional>
 

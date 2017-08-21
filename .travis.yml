@@ -14,7 +14,6 @@ addons:
       - cmake-data
       - libfftw3-dev
       - libglm-dev
-      - libglew-dev
 
 install:
     - if [ "$CXX" = "g++" ]; then export CXX="g++-6" CC="gcc-6"; fi

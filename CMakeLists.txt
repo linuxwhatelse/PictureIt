@@ -24,10 +24,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 
-# Include GLEW
-find_package(GLEW REQUIRED)
-include_directories(${GLEW_INCLUDE_DIRS})
-list(APPEND DEPLIBS ${GLEW_LIBRARIES})
+# Include OpenGL
+find_package(OpenGL REQUIRED)
+include_directories(${OpenGL_INCLUDE_DIR})
+list(APPEND DEPLIBS ${OPENGL_LIBRARIES})
 
 
 # Include GLM
@@ -45,7 +45,8 @@ list(APPEND DEPLIBS ${FFTW_LIBRARIES})
 
 
 # Set PictureIt source and header files
-set(SOURCES src/pictureit.cpp
+set(SOURCES src/single_header_libs.cpp
+            src/pictureit.cpp
             src/utils.cpp
             src/fft.cpp
             src/buffer.cpp
@@ -58,7 +59,8 @@ set(SOURCES src/pictureit.cpp
             src/spectrum/spectrum.cpp
 )
 
-set(HEADERS include/PictureIt/pictureit.hpp
+set(HEADERS include/PictureIt/gl_lite.hpp
+            include/PictureIt/pictureit.hpp
             include/PictureIt/utils.hpp
             include/PictureIt/fft.hpp
             include/PictureIt/buffer.hpp

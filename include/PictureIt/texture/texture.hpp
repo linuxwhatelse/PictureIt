@@ -1,6 +1,7 @@
 #pragma once
 
-#include <GL/glew.h>
+#include "gl_lite.hpp"
+
 #include <chrono>
 
 #define GLM_FORCE_RADIANS

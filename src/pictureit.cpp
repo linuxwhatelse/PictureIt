@@ -1,3 +1,5 @@
+#include "gl_lite.hpp"
+
 #include "pictureit.hpp"
 #include "utils.hpp"
 
@@ -23,14 +25,7 @@ const std::chrono::time_point<std::chrono::high_resolution_clock> t_start =
 
 
 PictureIt::PictureIt(Config::PictureIt pi_cfg) : cfg(pi_cfg) {
-    GLenum err = glewInit();
-    if (err != GLEW_OK) {
-        std::stringstream msg;
-        msg << "Could not initialize GLEW!" \
-            << " Reason: " << glewGetErrorString(err) \
-            << ", err code: " << err;
-        throw std::runtime_error(msg.str().c_str());
-    }
+    gl_lite_init();
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
