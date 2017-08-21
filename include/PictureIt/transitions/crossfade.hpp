@@ -9,6 +9,6 @@ public:
     Crossfade() {};
     ~Crossfade() {};
 
-    glm::vec4 color(glm::vec4);
-    glm::mat4 transform(glm::mat4 base) { return base; };
+    void transform(glm::mat4&) {};
+    void color(glm::vec4&);
 };

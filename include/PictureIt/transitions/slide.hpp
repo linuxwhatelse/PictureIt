@@ -9,6 +9,6 @@ public:
     Slide() {};
     ~Slide() {};
 
-    glm::vec4 color(glm::vec4 base) { return base; };
-    glm::mat4 transform(glm::mat4);
+    void transform(glm::mat4&);
+    void color(glm::vec4&) {};
 };

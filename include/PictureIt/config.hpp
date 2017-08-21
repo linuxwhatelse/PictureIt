@@ -54,7 +54,7 @@ namespace PI {
         };
 
         struct Texture {
-            enum DisplayMode {
+            enum Mode {
                 STRETCH,
                 CENTER,
                 SCALE,
@@ -63,7 +63,7 @@ namespace PI {
 
             std::string path;
 
-            DisplayMode mode = DisplayMode::CENTER;
+            Mode mode = Mode::CENTER;
 
             Transition transition_in;
             Transition transition_out;
@@ -82,7 +82,7 @@ namespace PI {
             Color bg_color = {0.0, 0.0, 0.0, 1.0};
 
             Transition transition;
-            Texture::DisplayMode display_mode = Texture::DisplayMode::CENTER;
+            Texture::Mode display_mode = Texture::Mode::CENTER;
 
             const char *image_dir = nullptr;
             bool recursive = true;

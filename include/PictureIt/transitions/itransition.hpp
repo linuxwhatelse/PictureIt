@@ -41,6 +41,6 @@ public:
     bool is_started() { return this->started; };
     bool is_done() { return this->done; };
 
-    virtual glm::vec4 color(glm::vec4 base) = 0;
-    virtual glm::mat4 transform(glm::mat4 base) = 0;
+    virtual void transform(glm::mat4& mvp) = 0;
+    virtual void color(glm::vec4& mvp) = 0;
 };

@@ -6,7 +6,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 
-glm::vec4 Crossfade::color(glm::vec4 base) {
+void Crossfade::color(glm::vec4& color) {
     float alpha = this->get_time() * glm::radians(this->speed);
 
     if (alpha >= 1.0) {
@@ -17,6 +17,5 @@ glm::vec4 Crossfade::color(glm::vec4 base) {
     if (this->direction == Direction::OUT)
         alpha = 1.0 - alpha;
 
-    base[3] = alpha;
-    return base;
+    color[3] = alpha;
 }

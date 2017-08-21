@@ -6,7 +6,6 @@
 #include <glm/gtc/type_ptr.hpp>
 
 
-glm::mat4 Slide::transform(glm::mat4 base) {
+void Slide::transform(glm::mat4& mvp) {
     // ToDo: Make it slide
-    return base;
 }

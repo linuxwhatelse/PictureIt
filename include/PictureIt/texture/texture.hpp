@@ -46,7 +46,7 @@ private:
         1, 2, 3  // Second Triangle
     };
 
-    glm::mat4 trans;
+    glm::mat4 mvp;
     glm::vec4 color = glm::vec4(0.0, 0.0, 0.0, 1.0);
 
     ITransition* t_in = nullptr;
@@ -98,6 +98,7 @@ public:
      * @param cfg Config::Texture to configure this texture
      */
     void configure(const Config::Texture& cfg);
+
     /**
      * Set in and out transitions for this texture.
      * @param in Transition used when showing this texture.
@@ -108,21 +109,27 @@ public:
 
     /**
      * Update the transformation matrix of this texture.
-     * @param t glm::mat4 transformation to apply.
+     * @param trans glm::mat4 transformation to apply.
      */
-    void update_transformation(glm::mat4 t);
+    void update_transformation(glm::mat4 trans);
 
     /**
      * Update the transformation matrix of this texture.
-     * @param t Config::Transformation to apply.
+     * @param trans Config::Transformation to apply.
      */
-    void update_transformation(Config::Transformation t);
+    void update_transformation(Config::Transformation trans);
 
     /**
      * Update this textures color value.
      * @param color rgba color to apply.
      */
     void update_color(Config::Color color);
+
+    /**
+     * Update this textures display mode.
+     * @param mode The display mode to apply.
+     */
+    void update_mode(Config::Texture::Mode mode);
 
     /**
      * Draw this texture.

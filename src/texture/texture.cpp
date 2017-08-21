@@ -82,6 +82,9 @@ void Texture::configure(const Config::Texture& cfg) {
     this->height = -1;
     this->ratio = -1;
 
+    this->mvp = glm::mat4();
+    this->color = glm::vec4();
+
     this->should_hide = false;
     this->hidden = false;
 
@@ -94,6 +97,7 @@ void Texture::configure(const Config::Texture& cfg) {
 
     this->update_transformation(cfg.pos);
     this->update_color(cfg.color);
+    this->update_mode(cfg.mode);
 
     set_transition(cfg.transition_in, cfg.transition_out);
 }
@@ -142,21 +146,46 @@ void Texture::set_transition(Config::Transition in, Config::Transition out) {
     }
 }
 
-void Texture::update_transformation(glm::mat4 t) {
-    this->trans = t;
+void Texture::update_transformation(glm::mat4 mvp) {
+    this->mvp = this->mvp * mvp;
 }
 
-void Texture::update_transformation(Config::Transformation t) {
-    glm::mat4 trans = glm::ortho(t.Xmin, t.Xmax, t.Ymin, t.Ymax);
-    this->update_transformation(trans);
+void Texture::update_transformation(Config::Transformation trans) {
+    glm::mat4 t = glm::ortho(trans.Xmin, trans.Xmax, trans.Ymin, trans.Ymax);
+    this->update_transformation(t);
 }
 
 void Texture::update_color(Config::Color color) {
     this->color = glm::vec4(color[0], color[1], color[2], color[3]);
 }
 
+void Texture::update_mode(Config::Texture::Mode mode) {
+    glm::mat4 trans;
+
+    switch (mode) {
+        case Config::Texture::Mode::STRETCH:
+            trans = glm::ortho(-1.0, 1.0, -1.0, 1.0);
+            break;
+
+        case Config::Texture::Mode::CENTER:
+            GLint view[4];
+            glGetIntegerv(GL_VIEWPORT, view);
+            printf("%i, %i, %i, %i\n", view[0], view[1], view[2], view[3]);
+            //trans = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f));
+            trans = glm::perspective(glm::radians(45.0f), 1.0f*view[2]/view[3], 0.1f, 100.0f);
+            break;
+
+        case Config::Texture::Mode::SCALE:
+            break;
+
+        case Config::Texture::Mode::ZOOM:
+            break;
+    }
+
+    this->mvp = this->mvp * trans;
+}
+
 void Texture::draw() {
-    //fprintf(stdout, "valid: %d\n", this->is_valid());
     if (! this->is_valid())
         return;
 
@@ -169,8 +198,6 @@ void Texture::draw() {
     GLint i_tex = this->sh.get_uniform("tex");
     glUniform1i(i_tex, this->tex_unit);
 
-    glm::mat4 trans = this->trans;
-    glm::vec4 color = this->color;
 
     this->transitioning = false;
 
@@ -181,12 +208,11 @@ void Texture::draw() {
         if (! this->t_in->is_started())
             this->t_in->start();
 
-        trans = this->t_in->transform(trans);
-        color = this->t_in->color(color);
+        this->t_in->transform(this->mvp);
+        this->t_in->color(this->color);
 
         if (this->t_in->is_done()) {
-            this->trans = trans;
-            this->color = color;
+            //this->trans = mvp;
         }
     }
 
@@ -198,12 +224,11 @@ void Texture::draw() {
             if (! this->t_out->is_started())
                 this->t_out->start();
 
-            trans = this->t_out->transform(trans);
-            color = this->t_out->color(color);
+            this->t_out->transform(this->mvp);
+            this->t_out->color(this->color);
 
             if (this->t_in->is_done()) {
-                this->trans = trans;
-                this->color = color;
+                //this->trans = mvp;
             }
         } else {
             this->hidden = true;
@@ -212,7 +237,7 @@ void Texture::draw() {
 
     // Tell the shader
     GLint i_trans = this->sh.get_uniform("trans");
-    glUniformMatrix4fv(i_trans, 1, GL_FALSE, glm::value_ptr(trans));
+    glUniformMatrix4fv(i_trans, 1, GL_FALSE, glm::value_ptr(this->mvp));
 
     GLint i_texColor = this->sh.get_uniform("texColor");
     glUniform4fv(i_texColor, 1, glm::value_ptr(color));
