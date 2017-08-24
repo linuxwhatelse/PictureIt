@@ -59,8 +59,7 @@ set(SOURCES src/single_header_libs.cpp
             src/spectrum/spectrum.cpp
 )
 
-set(HEADERS include/PictureIt/gl_lite.hpp
-            include/PictureIt/pictureit.hpp
+set(HEADERS include/PictureIt/pictureit.hpp
             include/PictureIt/utils.hpp
             include/PictureIt/fft.hpp
             include/PictureIt/buffer.hpp
@@ -90,6 +89,7 @@ set(SHADERS src/spectrum/shader/bar.geom
 
 # Create PictureIt static library.
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${HEADERS})
+#add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
 
 # Define PictureIt namespace, which is very useful for exporting the PictureIt target.

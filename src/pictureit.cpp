@@ -1,4 +1,5 @@
-#include "gl_lite.hpp"
+#define GL_GLEXT_PROTOTYPES
+#include <GL/gl.h>
 
 #include "pictureit.hpp"
 #include "utils.hpp"
@@ -25,8 +26,6 @@ const std::chrono::time_point<std::chrono::high_resolution_clock> t_start =
 
 
 PictureIt::PictureIt(Config::PictureIt pi_cfg) : cfg(pi_cfg) {
-    gl_lite_init();
-
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

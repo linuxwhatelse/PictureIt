@@ -1,6 +1,7 @@
 #pragma once
 
-#include "gl_lite.hpp"
+#define GL_GLEXT_PROTOTYPES
+#include <GL/gl.h>
 
 #include <chrono>
 
